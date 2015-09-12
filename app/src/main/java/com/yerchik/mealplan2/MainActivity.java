@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -108,7 +109,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         switch(id){
             case R.id.action_logout:
                 //show dialog
-                dialogHome = ProgressDialog.show(MainActivity.this,"","Please wait",false);
+                dialogHome = ProgressDialog.show(MainActivity.this,"","Please wait",true);
                 // logout the user
                 ParseUser.logOut();
                 dialogHome.dismiss();
@@ -141,7 +142,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
      * one of the sections/tabs/pages.
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
+        private int NUM_ITEMS = 3;
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -150,13 +151,22 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+            switch(position){
+                case 0:
+                    return FriendsFragment.newInstance(position);
+                case 1:
+                    return MealPlansFragment.newInstance(position);
+                case 2:
+                    return SearchFragment.newInstance(position);
+                default:
+                    return null;
+            }
         }
 
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 3;
+            return NUM_ITEMS;
         }
 
         @Override
@@ -172,39 +182,70 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             }
             return null;
         }
+
     }
+    public static class FriendsFragment extends Fragment {
+        private static final String FRAGMENT_NAME = "Friends";
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
+        public static FriendsFragment newInstance(int sectionNumber){
+            FriendsFragment fragment = new FriendsFragment();
             Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            args.putInt(FRAGMENT_NAME, sectionNumber);
             fragment.setArguments(args);
             return fragment;
         }
-
-        public PlaceholderFragment() {
+        public FriendsFragment(){
         }
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            return rootView;
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            View friendsView = inflater.inflate(R.layout.fragment_friends,container,false);
+            return friendsView;
         }
     }
+
+    public static class MealPlansFragment extends Fragment {
+        private static final String FRAGMENT_NAME = "MealPlans";
+
+        public static MealPlansFragment newInstance(int sectionNumber){
+            MealPlansFragment fragment = new MealPlansFragment();
+            Bundle args = new Bundle();
+            args.putInt(FRAGMENT_NAME, sectionNumber);
+            fragment.setArguments(args);
+            return fragment;
+        }
+        public MealPlansFragment(){
+        }
+
+
+        @Override
+        public View onCreateView(LayoutInflater inflater,  ViewGroup container, Bundle savedInstanceState) {
+            View MealPlansView = inflater.inflate(R.layout.fragment_meal_plans, container,false);
+            return MealPlansView;
+        }
+    }
+
+
+    public static class SearchFragment extends Fragment {
+        private static final String FRAGMENT_NAME = "Search";
+
+        public static SearchFragment newInstance(int sectionNumber){
+            SearchFragment fragment = new SearchFragment();
+            Bundle args = new Bundle();
+            args.putInt(FRAGMENT_NAME, sectionNumber);
+            fragment.setArguments(args);
+            return fragment;
+        }
+        public SearchFragment(){
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+            View SearchView = inflater.inflate(R.layout.fragment_search, container,false);
+            return SearchView;
+        }
+
+    }
+
 
 }
