@@ -38,7 +38,6 @@ public class LoginActivity extends Activity {
             @Override
             public void onClick(View v) {
 
-
                 // take user idNumber and password
                 String idNumberStr = idNumberView.getText().toString().trim();
                 String passwordStr = passwordView.getText().toString().trim();

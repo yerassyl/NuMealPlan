@@ -14,5 +14,4 @@ public class ParseApplication extends Application {
         Parse.initialize(this, "AgLXA7Q166mXb5wsD9vfmC7iuFro2Sm4v7Q73h4Q", "TArGPnHN8aGII3rqu8ulxQIz2Zq1haKBugOGEAYP");
     }
 
-
 }

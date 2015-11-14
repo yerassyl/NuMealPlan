@@ -1,7 +1,11 @@
 package com.yerchik.mealplan2;
 
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.Nullable;
@@ -13,13 +17,23 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.ProgressBar;
 
+import com.parse.FindCallback;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.yerchik.mealplan2.adapter.UsersAdapter;
+
+import org.xml.sax.helpers.ParserAdapter;
 
 
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
@@ -56,6 +70,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             startActivity(intent);
         }
 
+
+
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -89,6 +105,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                             .setText(mSectionsPagerAdapter.getPageTitle(i))
                             .setTabListener(this));
         }
+
+        mViewPager.setOffscreenPageLimit(3);
     }
 
 
@@ -111,7 +129,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                 //show dialog
                 dialogHome = ProgressDialog.show(MainActivity.this,"","Please wait",true);
                 // logout the user
-                ParseUser.logOut();
+                ParseUser.logOutInBackground();
                 dialogHome.dismiss();
                 finish();
                 Intent intent = new Intent(MainActivity.this,LoginActivity.class);
@@ -182,8 +200,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             }
             return null;
         }
-
     }
+
     public static class FriendsFragment extends Fragment {
         private static final String FRAGMENT_NAME = "Friends";
 
@@ -196,9 +214,69 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         }
         public FriendsFragment(){
         }
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            Log.d("yerchik", "friends fragment is created");
+            // start spinner to show that search is going on
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            ProgressBar pbar = new ProgressBar(getContext());
+            builder.setView(pbar);
+            final AlertDialog dialog = builder.create();
+            dialog.show();
+            // grab all user friends
+            // status 0 - not confirmed Friendship
+            // status 1 - confirmed Friendship
+            /*
+                // We need to perform this Join query
+                SELECT Friendship.status, User.username from Friendship, User
+                WHERE
+                CASE
 
+                WHEN Friendship.user_id = current_user.objectId
+                THEN Friendship.friend_id = User.user_id
+                WHEN Friendship.friend_id= current_user.objectId
+                THEN Friendship.user_id= User.user_id
+                END
+
+                AND
+                Friendship.status='1';
+            */
+            ParseUser currentUser = ParseUser.getCurrentUser();
+
+            ParseQuery<ParseObject> userId = ParseQuery.getQuery("Friendship");
+            userId.whereEqualTo("user_id", currentUser);
+
+            ParseQuery<ParseObject> friendId = ParseQuery.getQuery("Friendship");
+            friendId.whereEqualTo("friend_id", currentUser);
+
+            List<ParseQuery<ParseObject>> queries = new ArrayList<ParseQuery<ParseObject>>();
+            queries.add(userId);
+            queries.add(friendId);
+
+            ParseQuery<ParseObject> friendshipsQuery = ParseQuery.or(queries);
+            ParseQuery<ParseUser> friendsQuery = ParseUser.getQuery();
+            //friendsQuery.whereMatchesKeyInQuery("username","" friendshipsQuery);
+            friendsQuery.findInBackground(new FindCallback<ParseUser>() {
+                @Override
+                public void done(List<ParseUser> results, com.parse.ParseException e) {
+                    if (e==null){
+                        // success
+                        Log.d("yerchik", "friends found");
+                        dialog.dismiss();
+
+                        // populate list view with friends
+                        UsersAdapter adapter = new UsersAdapter(results,getContext());
+                        ListView friendsList = (ListView)getActivity().findViewById(R.id.friendsList);
+                        friendsList.setAdapter(adapter);
+                    }
+                }
+            });
+
+        }
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            Log.d("yerchik", "friends view is created");
             View friendsView = inflater.inflate(R.layout.fragment_friends,container,false);
             return friendsView;
         }
@@ -217,12 +295,12 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         public MealPlansFragment(){
         }
 
-
         @Override
         public View onCreateView(LayoutInflater inflater,  ViewGroup container, Bundle savedInstanceState) {
             View MealPlansView = inflater.inflate(R.layout.fragment_meal_plans, container,false);
             return MealPlansView;
         }
+
     }
 
 
