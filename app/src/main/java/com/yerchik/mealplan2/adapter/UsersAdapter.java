@@ -22,6 +22,7 @@ import java.util.List;
 public class UsersAdapter extends BaseAdapter {
     private List list;
     private Context context;
+
     public UsersAdapter(List listView, Context context){
         this.list = listView;
         this.context = context;
@@ -50,29 +51,9 @@ public class UsersAdapter extends BaseAdapter {
             convertView = LayoutInflater.from(context).inflate(R.layout.list_item_friend, parent, false);
         }
         TextView usernameTextView = (TextView) convertView.findViewById(R.id.usernameListItem);
-        String username = user.getString("username");
-        usernameTextView.setText(username);
-        Log.d("yerchik", username);
+        String name = user.getString("userName");
+        //String surname = user.getString("surname");
+        usernameTextView.setText(name);
         return convertView;
-
     }
-
-//    public UsersAdapter(Context context, List<ParseUser> users){
-//        super(context,0,users);
-//    }
-//    @Override
-//    public View getView(int position,View convertView,ViewGroup parent){
-//        // get the data item for this postion
-//        ParseObject user = getItem(position);
-//
-//        // Check if an existing view is being reused, otherwise inflate the view
-//        if (convertView == null) {
-//            convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_friend, parent, false);
-//        }
-//        TextView usernameTextView = (TextView) convertView.findViewById(R.id.usernameListItem);
-//        String username = user.getString("username");
-//        usernameTextView.setText(username);
-//        Log.d("yerchik", username);
-//        return convertView;
-//    }
 }

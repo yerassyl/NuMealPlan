@@ -24,6 +24,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
@@ -53,7 +55,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
      * The {@link ViewPager} that will host the section contents.
      */
     ViewPager mViewPager;
-
+    EditText searchFriend;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,8 +71,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             Intent intent = new Intent(this,LoginActivity.class);
             startActivity(intent);
         }
-
-
 
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
@@ -105,8 +105,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                             .setText(mSectionsPagerAdapter.getPageTitle(i))
                             .setTabListener(this));
         }
-
         mViewPager.setOffscreenPageLimit(3);
+
     }
 
 
@@ -223,7 +223,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             ProgressBar pbar = new ProgressBar(getContext());
             builder.setView(pbar);
             final AlertDialog dialog = builder.create();
-            dialog.show();
+            //dialog.show();
             // grab all user friends
             // status 0 - not confirmed Friendship
             // status 1 - confirmed Friendship
@@ -263,21 +263,22 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                     if (e==null){
                         // success
                         Log.d("yerchik", "friends found");
-                        dialog.dismiss();
-
+                        //dialog.dismiss();
                         // populate list view with friends
                         UsersAdapter adapter = new UsersAdapter(results,getContext());
                         ListView friendsList = (ListView)getActivity().findViewById(R.id.friendsList);
                         friendsList.setAdapter(adapter);
+                    }else {
+                        dialog.dismiss();
                     }
                 }
             });
-
         }
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             Log.d("yerchik", "friends view is created");
-            View friendsView = inflater.inflate(R.layout.fragment_friends,container,false);
+            View friendsView = inflater.inflate(R.layout.fragment_friends, container, false);
             return friendsView;
         }
     }
@@ -322,8 +323,61 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             View SearchView = inflater.inflate(R.layout.fragment_search, container,false);
             return SearchView;
         }
-
     }
 
+    // when searchFriendsBtn is clicked
+    public void searchFriends(View v){
+        searchFriend = (EditText)findViewById(R.id.searchFriendEditText);
+        String searchFriendStr = searchFriend.getText().toString().trim();
+
+        List<ParseQuery<ParseUser>> queries = new ArrayList<>();
+        Log.d("yerchik/login", searchFriendStr);
+        if (searchFriendStr.contains(" ")){
+            String[] parts = searchFriendStr.split(" ");
+            String part1 = parts[0];
+            String part2 = parts[1];
+            Log.d("yerchik/login", "name: " + part1 + ", surname: " + part2);
+
+            ParseQuery<ParseUser> query1 = ParseUser.getQuery();
+            query1.whereStartsWith("name", part1);
+            queries.add(query1);
+
+            ParseQuery<ParseUser> query2 = ParseUser.getQuery();
+            query2.whereStartsWith("surname", part2);
+            queries.add(query2);
+
+            ParseQuery<ParseUser> query3 = ParseUser.getQuery();
+            query3.whereStartsWith("surname",part1);
+            queries.add(query3);
+
+            ParseQuery<ParseUser> query4 = ParseUser.getQuery();
+            query4.whereStartsWith("name", part2);
+            queries.add(query4);
+        }else {
+            ParseQuery<ParseUser> query1 = ParseUser.getQuery();
+            query1.whereStartsWith("name",searchFriendStr);
+            queries.add(query1);
+
+            ParseQuery<ParseUser> query2 = ParseUser.getQuery();
+            query2.whereStartsWith("surname",searchFriendStr);
+            queries.add(query2);
+        }
+
+        ParseQuery<ParseUser> mainQuery = ParseUser.getQuery().or(queries);
+        mainQuery.findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> list, com.parse.ParseException e) {
+                if (e == null) {
+                    Log.d("yerchik", "users found " + list.toString());
+                    UsersAdapter adapter = new UsersAdapter(list, MainActivity.this);
+                    ListView searchResults = (ListView) findViewById(R.id.searchResults);
+                    searchResults.setAdapter(adapter);
+                } else {
+                    Log.d("yerchik", "nothing found");
+                }
+            }
+        });
+
+    }
 
 }

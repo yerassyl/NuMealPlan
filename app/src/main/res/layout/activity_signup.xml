@@ -7,6 +7,11 @@
     tools:context="com.yerchik.mealplan.SignupActivity"
     android:orientation="vertical">
 
+    <EditText android:id="@+id/username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/name"
+        android:layout_marginTop="40dp"/>
     <EditText android:id="@+id/emailSignup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
