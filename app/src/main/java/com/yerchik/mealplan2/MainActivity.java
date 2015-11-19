@@ -28,6 +28,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 
 import com.parse.FindCallback;
 import com.parse.ParseObject;
@@ -136,7 +137,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                 startActivity(intent);
                 break;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -224,6 +224,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             builder.setView(pbar);
             final AlertDialog dialog = builder.create();
             //dialog.show();
+
             // grab all user friends
             // status 0 - not confirmed Friendship
             // status 1 - confirmed Friendship
@@ -323,61 +324,72 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             View SearchView = inflater.inflate(R.layout.fragment_search, container,false);
             return SearchView;
         }
-    }
+        @Override
+        public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+            super.onViewCreated(view, savedInstanceState);
+            final SearchView searchFriends = (SearchView)getActivity().findViewById(R.id.friendSearchView);
+            searchFriends.setSubmitButtonEnabled(true);// enable submit button
 
-    // when searchFriendsBtn is clicked
-    public void searchFriends(View v){
-        searchFriend = (EditText)findViewById(R.id.searchFriendEditText);
-        String searchFriendStr = searchFriend.getText().toString().trim();
+            searchFriends.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String searchFriendStr) {
+                    List<ParseQuery<ParseUser>> queries = new ArrayList<>();
+                    Log.d("yerchik/login", searchFriendStr);
+                    if (searchFriendStr.contains(" ")){
+                        String[] parts = searchFriendStr.split(" ");
+                        String part1 = parts[0];
+                        String part2 = parts[1];
+                        Log.d("yerchik/login", "name: " + part1 + ", surname: " + part2);
 
-        List<ParseQuery<ParseUser>> queries = new ArrayList<>();
-        Log.d("yerchik/login", searchFriendStr);
-        if (searchFriendStr.contains(" ")){
-            String[] parts = searchFriendStr.split(" ");
-            String part1 = parts[0];
-            String part2 = parts[1];
-            Log.d("yerchik/login", "name: " + part1 + ", surname: " + part2);
+                        ParseQuery<ParseUser> query1 = ParseUser.getQuery();
+                        query1.whereStartsWith("name", part1);
+                        queries.add(query1);
 
-            ParseQuery<ParseUser> query1 = ParseUser.getQuery();
-            query1.whereStartsWith("name", part1);
-            queries.add(query1);
+                        ParseQuery<ParseUser> query2 = ParseUser.getQuery();
+                        query2.whereStartsWith("surname", part2);
+                        queries.add(query2);
 
-            ParseQuery<ParseUser> query2 = ParseUser.getQuery();
-            query2.whereStartsWith("surname", part2);
-            queries.add(query2);
+                        ParseQuery<ParseUser> query3 = ParseUser.getQuery();
+                        query3.whereStartsWith("surname",part1);
+                        queries.add(query3);
 
-            ParseQuery<ParseUser> query3 = ParseUser.getQuery();
-            query3.whereStartsWith("surname",part1);
-            queries.add(query3);
+                        ParseQuery<ParseUser> query4 = ParseUser.getQuery();
+                        query4.whereStartsWith("name", part2);
+                        queries.add(query4);
+                    }else {
+                        ParseQuery<ParseUser> query1 = ParseUser.getQuery();
+                        query1.whereStartsWith("name",searchFriendStr);
+                        queries.add(query1);
 
-            ParseQuery<ParseUser> query4 = ParseUser.getQuery();
-            query4.whereStartsWith("name", part2);
-            queries.add(query4);
-        }else {
-            ParseQuery<ParseUser> query1 = ParseUser.getQuery();
-            query1.whereStartsWith("name",searchFriendStr);
-            queries.add(query1);
+                        ParseQuery<ParseUser> query2 = ParseUser.getQuery();
+                        query2.whereStartsWith("surname",searchFriendStr);
+                        queries.add(query2);
+                    }
 
-            ParseQuery<ParseUser> query2 = ParseUser.getQuery();
-            query2.whereStartsWith("surname",searchFriendStr);
-            queries.add(query2);
-        }
-
-        ParseQuery<ParseUser> mainQuery = ParseUser.getQuery().or(queries);
-        mainQuery.findInBackground(new FindCallback<ParseUser>() {
-            @Override
-            public void done(List<ParseUser> list, com.parse.ParseException e) {
-                if (e == null) {
-                    Log.d("yerchik", "users found " + list.toString());
-                    UsersAdapter adapter = new UsersAdapter(list, MainActivity.this);
-                    ListView searchResults = (ListView) findViewById(R.id.searchResults);
-                    searchResults.setAdapter(adapter);
-                } else {
-                    Log.d("yerchik", "nothing found");
+                    ParseQuery<ParseUser> mainQuery = ParseUser.getQuery().or(queries);
+                    mainQuery.findInBackground(new FindCallback<ParseUser>() {
+                        @Override
+                        public void done(List<ParseUser> list, com.parse.ParseException e) {
+                            if (e == null) {
+                                Log.d("yerchik", "users found " + list.toString());
+                                UsersAdapter adapter = new UsersAdapter(list, getContext());
+                                ListView searchResults = (ListView) getActivity().findViewById(R.id.searchResults);
+                                searchResults.setAdapter(adapter);
+                            } else {
+                                Log.d("yerchik", "nothing found");
+                            }
+                        }
+                    });
+                    return true;
                 }
-            }
-        });
 
+                @Override
+                public boolean onQueryTextChange(String s) {
+                    Log.d("yerchik/search","changed");
+                    return false;
+                }
+            });
+        }
     }
 
 }

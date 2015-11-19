@@ -51,8 +51,10 @@ public class UsersAdapter extends BaseAdapter {
             convertView = LayoutInflater.from(context).inflate(R.layout.list_item_friend, parent, false);
         }
         TextView usernameTextView = (TextView) convertView.findViewById(R.id.usernameListItem);
-        String name = user.getString("userName");
-        //String surname = user.getString("surname");
+        String fname = user.getString("name").toLowerCase();
+        String lname = user.getString("surname").toLowerCase();
+        String name = fname.substring(0,1).toUpperCase()+fname.substring(1)+" "+lname.substring(0,1).toUpperCase()+lname.substring(1);
+
         usernameTextView.setText(name);
         return convertView;
     }

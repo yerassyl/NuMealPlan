@@ -1,49 +1,57 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".LoginActivity"
-    android:orientation="vertical"
-    android:gravity="center_vertical">
+    tools:context=".LoginActivity">
 
 
-    <EditText android:id="@+id/idNumberLogin"
+    <EditText
+        android:id="@+id/idNumberLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/id"
         android:inputType="numberSigned"
-        android:paddingTop="20dp"/>
-    <EditText android:id="@+id/passwordLogin"
+        android:paddingTop="20dp" />
+
+    <EditText
+        android:id="@+id/passwordLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/password"
-        android:paddingTop="20dp"
-        android:inputType="textPassword"/>
+        android:inputType="textPassword"
+        android:paddingTop="20dp" />
 
-    <Button android:id="@+id/loginBtnLogin"
+    <Button
+        android:id="@+id/loginBtnLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/button_custom"
         android:text="@string/login"
         android:textColor="@color/white"
-        android:textSize="20sp"
-        android:background="@drawable/button_custom"
-        android:layout_marginTop="20dp"
-        />
+        android:textSize="20sp" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/or"
         android:layout_gravity="center_horizontal"
-        android:layout_margin="10dp" />
-    <Button android:id="@+id/toSignupBtnLogin"
+        android:layout_margin="10dp"
+        android:text="@string/or" />
+
+    <Button
+        android:id="@+id/toSignupBtnLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/button_custom"
         android:text="@string/signup"
         android:textColor="@color/white"
-        android:textSize="20sp"
-        android:background="@drawable/button_custom"
-        />
+        android:textSize="20sp" />
 
 
 </LinearLayout>

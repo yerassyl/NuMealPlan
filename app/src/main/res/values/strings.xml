@@ -18,7 +18,7 @@
 
     <string name="password_not_confirmed">Make sure you confirm your password!</string>
     <string name="name_is_required">Name is required</string>
-    <string name="surname_is_required">Surname is required</string>
+    <string name="lname_is_required">Surname is required</string>
     <string name="email_is_required">Email is required</string>
     <string name="id_is_required">Id is required</string>
     <string name="password_is_required">Password is required</string>

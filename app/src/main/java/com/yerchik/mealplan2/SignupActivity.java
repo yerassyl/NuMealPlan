@@ -20,7 +20,7 @@ import com.parse.SignUpCallback;
 
 public class SignupActivity extends Activity {
 
-    protected EditText nameView,emailView,idNumberView,passwordView,passwordConfirmView;
+    protected EditText fnameView,lnameView,emailView,idNumberView,passwordView,passwordConfirmView;
     protected Button signUpBtnView;
     protected ProgressDialog dialogSignup;
 
@@ -30,7 +30,8 @@ public class SignupActivity extends Activity {
         setContentView(R.layout.activity_signup);
 
         // grab views
-        nameView = (EditText)findViewById(R.id.username);
+        fnameView = (EditText)findViewById(R.id.firstname);
+        lnameView = (EditText)findViewById(R.id.lastname);
         emailView = (EditText)findViewById(R.id.emailSignup);
         idNumberView = (EditText)findViewById(R.id.idNumberSignup);
         passwordView = (EditText)findViewById(R.id.passwordSignup);
@@ -42,17 +43,21 @@ public class SignupActivity extends Activity {
             @Override
             public void onClick(View view) {
                 // get user input and convert it to String
-                String nameStr = nameView.getText().toString().trim();
+                String fnameStr = fnameView.getText().toString().trim().toLowerCase(); // also convert to lower case for better search
+                String lnameStr = lnameView.getText().toString().trim().toLowerCase();
                 String emailStr = emailView.getText().toString().trim();
                 String idNumberStr = idNumberView.getText().toString().trim();
                 String passwordStr = passwordView.getText().toString().trim();
                 String passwordConfirmStr = passwordConfirmView.getText().toString().trim();
 
                 // check if user provided all required data
-                if (nameStr.equals("") || emailStr.equals("") || idNumberStr.equals("") || passwordStr.equals("") || passwordConfirmStr.equals("")) {
+                if (fnameStr.equals("") || lnameStr.equals("") || emailStr.equals("") || idNumberStr.equals("") || passwordStr.equals("") || passwordConfirmStr.equals("")) {
                     //Toast.makeText(getApplicationContext(),"empty",Toast.LENGTH_SHORT).show();
-                    if (nameStr.equals("")){
-                        nameView.setError(getString(R.string.name_is_required));
+                    if (fnameStr.equals("")){
+                        fnameView.setError(getString(R.string.name_is_required));
+                    }
+                    if (lnameStr.equals("")){
+                        lnameView.setError(getString(R.string.lname_is_required));
                     }
                     if (emailStr.equals("")) {
                         emailView.setError(getString(R.string.email_is_required));
@@ -81,7 +86,8 @@ public class SignupActivity extends Activity {
                     user.setPassword(passwordStr);
                     user.setEmail(emailStr);
                     // other fields can be set just like with ParseObject
-                    user.put("name", nameStr);
+                    user.put("name", fnameStr);
+                    user.put("surname", lnameStr);
                     user.signUpInBackground(new SignUpCallback() {
                         public void done(ParseException e) {
                             if (e == null) {

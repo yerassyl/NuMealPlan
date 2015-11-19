@@ -3,25 +3,12 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <SearchView android:id="@+id/friendSearchView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <EditText android:id="@+id/searchFriendEditText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="@string/search"
-            android:layout_marginTop="20dp"
-            android:layout_weight="3"/>
-        <Button android:id="@+id/searchFriendBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/search"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/button_custom"
-            android:layout_weight="1"
-            android:onClick="searchFriends"/>
-    </LinearLayout>
+        android:queryHint="@string/search"
+        android:iconifiedByDefault="false">
+    </SearchView>
 
     <ListView android:id="@+id/searchResults"
         android:layout_width="match_parent"
