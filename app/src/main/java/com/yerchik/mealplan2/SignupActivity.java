@@ -88,6 +88,9 @@ public class SignupActivity extends Activity {
                     // other fields can be set just like with ParseObject
                     user.put("name", fnameStr);
                     user.put("surname", lnameStr);
+                    user.put("friend_count", 0);
+                    user.put("shared_count", 0);
+                    user.put("taken_count", 0);
                     user.signUpInBackground(new SignUpCallback() {
                         public void done(ParseException e) {
                             if (e == null) {

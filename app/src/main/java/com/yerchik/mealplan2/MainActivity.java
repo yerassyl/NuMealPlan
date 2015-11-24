@@ -23,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,6 +36,9 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.yerchik.mealplan2.adapter.UsersAdapter;
+import com.yerchik.mealplan2.view.FriendsFragment;
+import com.yerchik.mealplan2.view.MealPlansFragment;
+import com.yerchik.mealplan2.view.SearchFragment;
 
 import org.xml.sax.helpers.ParserAdapter;
 
@@ -57,6 +61,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
      */
     ViewPager mViewPager;
     EditText searchFriend;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -202,194 +207,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         }
     }
 
-    public static class FriendsFragment extends Fragment {
-        private static final String FRAGMENT_NAME = "Friends";
 
-        public static FriendsFragment newInstance(int sectionNumber){
-            FriendsFragment fragment = new FriendsFragment();
-            Bundle args = new Bundle();
-            args.putInt(FRAGMENT_NAME, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-        public FriendsFragment(){
-        }
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            Log.d("yerchik", "friends fragment is created");
-            // start spinner to show that search is going on
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            ProgressBar pbar = new ProgressBar(getContext());
-            builder.setView(pbar);
-            final AlertDialog dialog = builder.create();
-            //dialog.show();
-
-            // grab all user friends
-            // status 0 - not confirmed Friendship
-            // status 1 - confirmed Friendship
-            /*
-                // We need to perform this Join query
-                SELECT Friendship.status, User.username from Friendship, User
-                WHERE
-                CASE
-
-                WHEN Friendship.user_id = current_user.objectId
-                THEN Friendship.friend_id = User.user_id
-                WHEN Friendship.friend_id= current_user.objectId
-                THEN Friendship.user_id= User.user_id
-                END
-
-                AND
-                Friendship.status='1';
-            */
-            ParseUser currentUser = ParseUser.getCurrentUser();
-
-            ParseQuery<ParseObject> userId = ParseQuery.getQuery("Friendship");
-            userId.whereEqualTo("user_id", currentUser);
-
-            ParseQuery<ParseObject> friendId = ParseQuery.getQuery("Friendship");
-            friendId.whereEqualTo("friend_id", currentUser);
-
-            List<ParseQuery<ParseObject>> queries = new ArrayList<ParseQuery<ParseObject>>();
-            queries.add(userId);
-            queries.add(friendId);
-
-            ParseQuery<ParseObject> friendshipsQuery = ParseQuery.or(queries);
-            ParseQuery<ParseUser> friendsQuery = ParseUser.getQuery();
-            //friendsQuery.whereMatchesKeyInQuery("username","" friendshipsQuery);
-            friendsQuery.findInBackground(new FindCallback<ParseUser>() {
-                @Override
-                public void done(List<ParseUser> results, com.parse.ParseException e) {
-                    if (e==null){
-                        // success
-                        Log.d("yerchik", "friends found");
-                        //dialog.dismiss();
-                        // populate list view with friends
-                        UsersAdapter adapter = new UsersAdapter(results,getContext());
-                        ListView friendsList = (ListView)getActivity().findViewById(R.id.friendsList);
-                        friendsList.setAdapter(adapter);
-                    }else {
-                        dialog.dismiss();
-                    }
-                }
-            });
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            Log.d("yerchik", "friends view is created");
-            View friendsView = inflater.inflate(R.layout.fragment_friends, container, false);
-            return friendsView;
-        }
-    }
-
-    public static class MealPlansFragment extends Fragment {
-        private static final String FRAGMENT_NAME = "MealPlans";
-
-        public static MealPlansFragment newInstance(int sectionNumber){
-            MealPlansFragment fragment = new MealPlansFragment();
-            Bundle args = new Bundle();
-            args.putInt(FRAGMENT_NAME, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-        public MealPlansFragment(){
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater,  ViewGroup container, Bundle savedInstanceState) {
-            View MealPlansView = inflater.inflate(R.layout.fragment_meal_plans, container,false);
-            return MealPlansView;
-        }
-
-    }
-
-
-    public static class SearchFragment extends Fragment {
-        private static final String FRAGMENT_NAME = "Search";
-
-        public static SearchFragment newInstance(int sectionNumber){
-            SearchFragment fragment = new SearchFragment();
-            Bundle args = new Bundle();
-            args.putInt(FRAGMENT_NAME, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-        public SearchFragment(){
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-            View SearchView = inflater.inflate(R.layout.fragment_search, container,false);
-            return SearchView;
-        }
-        @Override
-        public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-            super.onViewCreated(view, savedInstanceState);
-            final SearchView searchFriends = (SearchView)getActivity().findViewById(R.id.friendSearchView);
-            searchFriends.setSubmitButtonEnabled(true);// enable submit button
-
-            searchFriends.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextSubmit(String searchFriendStr) {
-                    List<ParseQuery<ParseUser>> queries = new ArrayList<>();
-                    Log.d("yerchik/login", searchFriendStr);
-                    if (searchFriendStr.contains(" ")){
-                        String[] parts = searchFriendStr.split(" ");
-                        String part1 = parts[0];
-                        String part2 = parts[1];
-                        Log.d("yerchik/login", "name: " + part1 + ", surname: " + part2);
-
-                        ParseQuery<ParseUser> query1 = ParseUser.getQuery();
-                        query1.whereStartsWith("name", part1);
-                        queries.add(query1);
-
-                        ParseQuery<ParseUser> query2 = ParseUser.getQuery();
-                        query2.whereStartsWith("surname", part2);
-                        queries.add(query2);
-
-                        ParseQuery<ParseUser> query3 = ParseUser.getQuery();
-                        query3.whereStartsWith("surname",part1);
-                        queries.add(query3);
-
-                        ParseQuery<ParseUser> query4 = ParseUser.getQuery();
-                        query4.whereStartsWith("name", part2);
-                        queries.add(query4);
-                    }else {
-                        ParseQuery<ParseUser> query1 = ParseUser.getQuery();
-                        query1.whereStartsWith("name",searchFriendStr);
-                        queries.add(query1);
-
-                        ParseQuery<ParseUser> query2 = ParseUser.getQuery();
-                        query2.whereStartsWith("surname",searchFriendStr);
-                        queries.add(query2);
-                    }
-
-                    ParseQuery<ParseUser> mainQuery = ParseUser.getQuery().or(queries);
-                    mainQuery.findInBackground(new FindCallback<ParseUser>() {
-                        @Override
-                        public void done(List<ParseUser> list, com.parse.ParseException e) {
-                            if (e == null) {
-                                Log.d("yerchik", "users found " + list.toString());
-                                UsersAdapter adapter = new UsersAdapter(list, getContext());
-                                ListView searchResults = (ListView) getActivity().findViewById(R.id.searchResults);
-                                searchResults.setAdapter(adapter);
-                            } else {
-                                Log.d("yerchik", "nothing found");
-                            }
-                        }
-                    });
-                    return true;
-                }
-
-                @Override
-                public boolean onQueryTextChange(String s) {
-                    Log.d("yerchik/search","changed");
-                    return false;
-                }
-            });
-        }
-    }
 
 }
