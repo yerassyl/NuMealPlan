@@ -63,20 +63,30 @@
         android:layout_marginTop="20dp">
 
         <Button android:id="@+id/requestFriendshipBtn"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/add_to_friends"
             android:background="@drawable/button_custom"
             android:textColor="#fff"
-            android:padding="10dp"
-            android:onClick="requestFriendship"
-            android:visibility="invisible"/>
+            android:visibility="gone"
+            android:onClick="requestFriendship"/>
+
+        <Button android:id="@+id/acceptFriendshipBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/accept_request"
+            android:background="@drawable/button_custom"
+            android:textColor="#fff"
+            android:visibility="gone" />
 
         <TextView android:id="@+id/requestSent"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/request_is_sent"
-            android:visibility="invisible"/>
+            android:visibility="gone"
+            android:padding="10dp"
+            android:background="@color/material_grey_300"
+            android:gravity="center"/>
 
     </LinearLayout>
 

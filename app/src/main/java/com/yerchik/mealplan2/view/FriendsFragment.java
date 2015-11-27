@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -20,6 +21,8 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.yerchik.mealplan2.R;
 import com.yerchik.mealplan2.UserProfileActivity;
+import com.yerchik.mealplan2.adapter.ParseProxyObject;
+import com.yerchik.mealplan2.adapter.RequestsAdapter;
 import com.yerchik.mealplan2.adapter.UsersAdapter;
 
 import java.util.ArrayList;
@@ -27,8 +30,11 @@ import java.util.List;
 
 public class FriendsFragment extends Fragment {
     private static final String FRAGMENT_NAME = "Friends";
-    ListView friendsList;
-    UsersAdapter adapter;
+
+    ListView requestsList,friendsList;
+    UsersAdapter usersAdapter;
+    RequestsAdapter requestsAdapter;
+    ParseUser currentUser;
 
     public static FriendsFragment newInstance(int sectionNumber){
         FriendsFragment fragment = new FriendsFragment();
@@ -39,6 +45,7 @@ public class FriendsFragment extends Fragment {
     }
     public FriendsFragment(){
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,74 +56,60 @@ public class FriendsFragment extends Fragment {
         builder.setView(pbar);
         final AlertDialog dialog = builder.create();
         //dialog.show();
+        currentUser = ParseUser.getCurrentUser();
 
-        // grab all user friends
-        // status 0 - not confirmed Friendship
-        // status 1 - confirmed Friendship
-            /*
-                // We need to perform this Join query
-                SELECT Friendship.status, User.username from Friendship, User
-                WHERE
-                CASE
 
-                WHEN Friendship.user_id = current_user.objectId
-                THEN Friendship.friend_id = User.user_id
-                WHEN Friendship.friend_id= current_user.objectId
-                THEN Friendship.user_id= User.user_id
-                END
-
-                AND
-                Friendship.status='1';
-            */
-        ParseUser currentUser = ParseUser.getCurrentUser();
-
-        ParseQuery<ParseObject> userId = ParseQuery.getQuery("Friendship");
-        userId.whereEqualTo("user_id", currentUser);
-
-        ParseQuery<ParseObject> friendId = ParseQuery.getQuery("Friendship");
-        friendId.whereEqualTo("friend_id", currentUser);
-
-        List<ParseQuery<ParseObject>> queries = new ArrayList<ParseQuery<ParseObject>>();
-        queries.add(userId);
-        queries.add(friendId);
-
-        ParseQuery<ParseObject> friendshipsQuery = ParseQuery.or(queries);
         ParseQuery<ParseUser> friendsQuery = ParseUser.getQuery();
         //friendsQuery.whereMatchesKeyInQuery("username","" friendshipsQuery);
         friendsQuery.findInBackground(new FindCallback<ParseUser>() {
             @Override
             public void done(List<ParseUser> results, com.parse.ParseException e) {
-                if (e==null){
+                if (e==null) {
                     // success
-                    Log.d("yerchik", "friends found");
                     //dialog.dismiss();
                     // populate list view with friends
-                    adapter = new UsersAdapter(results,getContext());
+                    usersAdapter = new UsersAdapter(results,getContext());
+                    Log.d("yerchik/list", results.size()+"");
                     friendsList = (ListView)getActivity().findViewById(R.id.friendsList);
-                    friendsList.setAdapter(adapter);
+                    friendsList.setAdapter(usersAdapter);
                     friendsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                            ParseObject clickedUser = (ParseUser)adapter.getItem(position);
-                                Log.d("yerchik", "found "+clickedUser.getString("name"));
-                                Intent intent = new Intent(getContext(), UserProfileActivity.class);
-                                intent.putExtra("userID", clickedUser.getObjectId());
-                                intent.putExtra("name", clickedUser.getString("name"));
-                                intent.putExtra("surname", clickedUser.getString("surname"));
-                                intent.putExtra("email", clickedUser.getString("email"));
-                                intent.putExtra("friend_count",clickedUser.getNumber("friend_count"));
-                                intent.putExtra("shared_count",clickedUser.getNumber("shared_count"));
-                                intent.putExtra("taken_count", clickedUser.getNumber("taken_count"));
-                                Log.d("yerchik", "friend_count: "+clickedUser.getNumber("friend_count"));
-                                startActivity(intent);
+                            Log.d("yerchik", "pos: "+position);
+                            showUserProfile(position, usersAdapter);
                         }
                     });
-                }else {
+
+                } else {
                     dialog.dismiss();
                 }
             }
         });
 
+
+        // GRAB ALL FRIENDSHIP REQUESTS /////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        ParseQuery<ParseObject> incomingFriendshipRequests = ParseQuery.getQuery("Friendship");
+        incomingFriendshipRequests.whereEqualTo("to", currentUser );
+        incomingFriendshipRequests.whereEqualTo("status", 0);
+        incomingFriendshipRequests.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> requests, ParseException e) {
+                if (e==null) {
+                    requestsAdapter = new RequestsAdapter(requests, getContext());
+                    requestsList = (ListView)getActivity().findViewById(R.id.requestsToFriendship);
+                    requestsList.setAdapter(requestsAdapter);
+                    requestsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                            showUserProfile(position, requestsAdapter);
+                        }
+                    });
+                } else {
+
+                }
+            }
+        });
     }
 
     @Override
@@ -124,6 +117,26 @@ public class FriendsFragment extends Fragment {
         Log.d("yerchik", "on friends view create");
         View friendsView = inflater.inflate(R.layout.fragment_friends, container, false);
         return friendsView;
+    }
+
+    // starts UserPofileActivity and passes user information to it
+    // position: position of list item in list view (passed in onItemClickListenre event
+    public void showUserProfile(int position, Adapter adapter){
+        ParseObject clickedUser = (ParseObject)adapter.getItem(position);
+        ParseProxyObject ppo = new ParseProxyObject(clickedUser);
+
+        Intent intent = new Intent(getContext(), UserProfileActivity.class);
+        //intent.putExtra("clickedUser", ppo);
+
+        // if our object is Friendship object
+        // we need to get User object from it
+        if (clickedUser.has("from")){
+            intent.putExtra("userId", clickedUser.getParseObject("from").getObjectId());
+            Log.d("yerchik", "has:" + clickedUser.getParseObject("from").getObjectId());
+        }else {
+            intent.putExtra("userId", clickedUser.getObjectId());
+        }
+        startActivity(intent);
     }
 
 }

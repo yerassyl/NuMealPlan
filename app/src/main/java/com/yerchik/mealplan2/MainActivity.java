@@ -23,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -35,6 +36,7 @@ import com.parse.FindCallback;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.yerchik.mealplan2.adapter.ParseProxyObject;
 import com.yerchik.mealplan2.adapter.UsersAdapter;
 import com.yerchik.mealplan2.view.FriendsFragment;
 import com.yerchik.mealplan2.view.MealPlansFragment;
@@ -206,7 +208,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             return null;
         }
     }
-
 
 
 }

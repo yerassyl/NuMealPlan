@@ -101,16 +101,9 @@ public class SearchFragment extends Fragment {
                                 @Override
                                 public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                                     ParseObject clickedUser = (ParseUser) adapter.getItem(position);
-
                                     Log.d("yerchik", "found " + clickedUser.getString("name"));
                                     Intent intent = new Intent(getContext(), UserProfileActivity.class);
-                                    intent.putExtra("name", clickedUser.getString("name"));
-                                    intent.putExtra("surname", clickedUser.getString("surname"));
-                                    intent.putExtra("email", clickedUser.getString("email"));
-                                    intent.putExtra("friend_count", clickedUser.getNumber("friend_count"));
-                                    intent.putExtra("shared_count", clickedUser.getNumber("shared_count"));
-                                    intent.putExtra("taken_count", clickedUser.getNumber("taken_count"));
-                                    Log.d("yerchik", "friend_count: " + clickedUser.getNumber("friend_count"));
+                                    intent.putExtra("userId", clickedUser.getObjectId());
                                     startActivity(intent);
                                 }
                             });

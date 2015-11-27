@@ -36,6 +36,9 @@
 
     <string name="add_to_friends">Add to friends</string>
     <string name="request_is_sent">Your request is sent</string>
+    <string name="accept_request">Accept request</string>
 
+    <string name="my_requests">Requests</string>
+    <string name="my_friends">Friends</string>
 
 </resources>

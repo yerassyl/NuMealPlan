@@ -3,9 +3,32 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/my_requests"
+        android:background="@color/material_grey_300"
+        android:padding="10dp"
+        android:gravity="center" />
+
+    <ListView android:id="@+id/requestsToFriendship"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </ListView>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/my_friends"
+        android:background="@color/material_grey_300"
+        android:padding="10dp"
+        android:gravity="center"/>
+
     <ListView android:id="@+id/friendsList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
     </ListView>
 
 </LinearLayout>
