@@ -63,6 +63,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
      */
     ViewPager mViewPager;
     EditText searchFriend;
+    String currentUserName;
+    ParseUser currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +72,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         setContentView(R.layout.activity_main);
 
         // check if user is logged in
-        ParseUser currentUser = ParseUser.getCurrentUser();
+        currentUser = ParseUser.getCurrentUser();
         if (currentUser != null) {
             // stay at HomePage
         } else {
@@ -79,10 +81,20 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             Intent intent = new Intent(this,LoginActivity.class);
             startActivity(intent);
         }
+        try {
+            currentUserName = currentUser.getString("name");
+        }catch(NullPointerException e){
+
+        }
 
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        if (currentUserName!=null){
+            setTitle(currentUserName.substring(0,1).toUpperCase()+currentUserName.substring(1));
+        }
+
+
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.

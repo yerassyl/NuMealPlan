@@ -2,8 +2,79 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <TextView
-        android:layout_width="wrap_content"
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Meal Plans"/>
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <Button android:id="@+id/shareLunchBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/share_lunch"
+                android:background="@drawable/button_custom"
+                android:textColor="@color/white"
+                android:padding="10dp" />
+
+            <Button android:id="@+id/takeBackLunchBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/take_back_lunch"
+                android:background="@drawable/button_grey"
+                android:textColor="@color/background_floating_material_dark"
+                android:padding="10dp"
+                android:visibility="gone"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <Button android:id="@+id/shareDinerBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/share_dinner"
+                android:background="@drawable/button_custom"
+                android:textColor="@color/white"
+                android:padding="10dp" />
+
+            <Button android:id="@+id/takeBackDinnerBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/take_back_dinner"
+                android:background="@drawable/button_grey"
+                android:textColor="@color/background_floating_material_dark"
+                android:padding="10dp"
+                android:visibility="gone"/>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/open_access_meal_plans"
+            android:textSize="20sp"
+            android:padding="10dp"
+            android:gravity="center"
+            android:background="@color/material_grey_300"/>
+    </LinearLayout>
+
+
 </LinearLayout>

@@ -10,6 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.yerchik.mealplan2.R;
@@ -59,11 +60,22 @@ public class UsersAdapter extends BaseAdapter {
         TextView usernameTextView = (TextView) convertView.findViewById(R.id.usernameListItem);
         String fname,lname,name;
 
-        fname = object.getString("name").toLowerCase();
-        lname = object.getString("surname").toLowerCase();
-        name = fname.substring(0,1).toUpperCase()+fname.substring(1)+" "+lname.substring(0,1).toUpperCase()+lname.substring(1);
+        if (object.has("from")){
+            try {
+                fname = object.getParseObject("from").fetchIfNeeded().getString("name").toLowerCase();
+                lname = object.getParseObject("from").fetchIfNeeded().getString("surname").toLowerCase();
+                name = fname.substring(0, 1).toUpperCase() + fname.substring(1) + " " + lname.substring(0, 1).toUpperCase() + lname.substring(1);
+                usernameTextView.setText(name);
+            } catch(ParseException e){
 
-        usernameTextView.setText(name);
+            }
+        }else {
+            fname = object.getString("name").toLowerCase();
+            lname = object.getString("surname").toLowerCase();
+            name = fname.substring(0,1).toUpperCase()+fname.substring(1)+" "+lname.substring(0,1).toUpperCase()+lname.substring(1);
+            usernameTextView.setText(name);
+        }
+
 
         return convertView;
     }

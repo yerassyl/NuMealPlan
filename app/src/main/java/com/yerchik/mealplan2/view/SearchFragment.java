@@ -45,6 +45,7 @@ public class SearchFragment extends Fragment {
         View SearchView = inflater.inflate(R.layout.fragment_search, container,false);
         return SearchView;
     }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);

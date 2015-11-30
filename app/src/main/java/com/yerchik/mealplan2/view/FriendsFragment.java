@@ -14,18 +14,14 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import com.parse.FindCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.yerchik.mealplan2.R;
 import com.yerchik.mealplan2.UserProfileActivity;
-import com.yerchik.mealplan2.adapter.ParseProxyObject;
-import com.yerchik.mealplan2.adapter.RequestsAdapter;
 import com.yerchik.mealplan2.adapter.UsersAdapter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class FriendsFragment extends Fragment {
@@ -33,7 +29,7 @@ public class FriendsFragment extends Fragment {
 
     ListView requestsList,friendsList;
     UsersAdapter usersAdapter;
-    RequestsAdapter requestsAdapter;
+    UsersAdapter requestsAdapter;
     ParseUser currentUser;
 
     public static FriendsFragment newInstance(int sectionNumber){
@@ -60,13 +56,15 @@ public class FriendsFragment extends Fragment {
 
 
         ParseQuery<ParseUser> friendsQuery = ParseUser.getQuery();
-        //friendsQuery.whereMatchesKeyInQuery("username","" friendshipsQuery);
-        friendsQuery.findInBackground(new FindCallback<ParseUser>() {
+        ParseQuery<ParseObject> friendshipsQuery = ParseQuery.getQuery("Friendship");
+        friendshipsQuery.whereEqualTo("to",currentUser);
+        friendshipsQuery.whereEqualTo("status",1);
+        friendshipsQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<ParseUser> results, com.parse.ParseException e) {
+            public void done(List<ParseObject> results, com.parse.ParseException e) {
                 if (e==null) {
                     // success
-                    //dialog.dismiss();
+                    // dialog.dismiss();
                     // populate list view with friends
                     usersAdapter = new UsersAdapter(results,getContext());
                     Log.d("yerchik/list", results.size()+"");
@@ -87,7 +85,7 @@ public class FriendsFragment extends Fragment {
         });
 
 
-        // GRAB ALL FRIENDSHIP REQUESTS /////////////////////////////////////////
+        // GRAB ALL INCOMING FRIENDSHIP REQUESTS /////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         ParseQuery<ParseObject> incomingFriendshipRequests = ParseQuery.getQuery("Friendship");
         incomingFriendshipRequests.whereEqualTo("to", currentUser );
@@ -96,7 +94,7 @@ public class FriendsFragment extends Fragment {
             @Override
             public void done(List<ParseObject> requests, ParseException e) {
                 if (e==null) {
-                    requestsAdapter = new RequestsAdapter(requests, getContext());
+                    requestsAdapter = new UsersAdapter(requests, getContext());
                     requestsList = (ListView)getActivity().findViewById(R.id.requestsToFriendship);
                     requestsList.setAdapter(requestsAdapter);
                     requestsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -123,7 +121,7 @@ public class FriendsFragment extends Fragment {
     // position: position of list item in list view (passed in onItemClickListenre event
     public void showUserProfile(int position, Adapter adapter){
         ParseObject clickedUser = (ParseObject)adapter.getItem(position);
-        ParseProxyObject ppo = new ParseProxyObject(clickedUser);
+        //ParseProxyObject ppo = new ParseProxyObject(clickedUser);
 
         Intent intent = new Intent(getContext(), UserProfileActivity.class);
         //intent.putExtra("clickedUser", ppo);

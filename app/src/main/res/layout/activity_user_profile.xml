@@ -41,7 +41,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="24 friends"
-                android:layout_marginTop="3dp"/>
+                android:layout_marginTop="3dp"
+                android:visibility="gone"/>
 
             <TextView android:id="@+id/sharedCount"
                 android:layout_width="wrap_content"

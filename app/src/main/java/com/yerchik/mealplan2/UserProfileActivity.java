@@ -82,7 +82,7 @@ public class UserProfileActivity extends ActionBarActivity {
 
                     profileNameStr = Name + " " + Surname;
                     emailStr = clickedUser.getString("email");
-                    friendsCountStr = clickedUser.getInt("friend_count") + " friends";
+                    //friendsCountStr = clickedUser.getInt("friend_count") + " friends";
                     sharedCountStr = clickedUser.getInt("shared_count") + " shared meal plans";
                     takenCountStr = clickedUser.getInt("taken_count") + " taken meal plans";
 
@@ -93,9 +93,9 @@ public class UserProfileActivity extends ActionBarActivity {
                     if (emailStr != null) {
                         emailView.setText(emailStr);
                     }
-                    if (friendsCountStr != null) {
-                        friendsCountView.setText(friendsCountStr);
-                    }
+//                    if (friendsCountStr != null) {
+//                        friendsCountView.setText(friendsCountStr);
+//                    }
                     if (sharedCountStr != null) {
                         sharedCountView.setText(sharedCountStr);
                     }
