@@ -74,6 +74,13 @@
             android:padding="10dp"
             android:gravity="center"
             android:background="@color/material_grey_300"/>
+
+        <ListView android:id="@+id/mealPlans"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </ListView>
+
     </LinearLayout>
 
 

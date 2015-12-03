@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.yerchik.mealplan2"
-        minSdkVersion 11
+        minSdkVersion 14
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -26,4 +26,7 @@ dependencies {
     // Parse
     compile 'com.parse.bolts:bolts-android:1.+'
     compile fileTree(dir: 'libs', include: 'Parse-*.jar')
+
+    //circular progress bar
+    compile 'com.github.rahatarmanahmed:circularprogressview:2.4.0'
 }

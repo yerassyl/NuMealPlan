@@ -3,6 +3,10 @@ package com.yerchik.mealplan2.adapter;
 // By Jamie Chapman, @chappers57
 // License: open, do as you wish, just don't blame me if stuff breaks ;-)
 
+
+// This class can be used to send ParseObject to activity's via putExtra
+// For now it is not used in this project since some unexpected problems occured with it.
+
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 

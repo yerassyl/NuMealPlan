@@ -10,9 +10,24 @@
         android:iconifiedByDefault="false">
     </SearchView>
 
+    <com.github.rahatarmanahmed.cpv.CircularProgressView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/progressSearch"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        app:cpv_animAutostart="true"
+        app:cpv_indeterminate="true"
+        app:cpv_thickness="2dp"
+        app:cpv_color="@color/main"
+        android:visibility="gone"
+        android:layout_marginTop="10dp"
+        />
+
+
     <ListView android:id="@+id/searchResults"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp">
 
     </ListView>
 

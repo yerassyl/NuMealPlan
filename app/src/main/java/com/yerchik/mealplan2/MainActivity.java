@@ -1,14 +1,11 @@
 package com.yerchik.mealplan2;
 
-import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import android.app.AlertDialog;
+
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -18,31 +15,15 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Adapter;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.SearchView;
 
-import com.parse.FindCallback;
 import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.yerchik.mealplan2.adapter.ParseProxyObject;
-import com.yerchik.mealplan2.adapter.UsersAdapter;
 import com.yerchik.mealplan2.view.FriendsFragment;
 import com.yerchik.mealplan2.view.MealPlansFragment;
 import com.yerchik.mealplan2.view.SearchFragment;
-
-import org.xml.sax.helpers.ParserAdapter;
 
 
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
@@ -65,6 +46,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     EditText searchFriend;
     String currentUserName;
     ParseUser currentUser;
+    public static List<ParseObject> userFriendships;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

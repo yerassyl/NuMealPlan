@@ -11,10 +11,19 @@
         android:padding="10dp"
         android:gravity="center" />
 
+    <com.github.rahatarmanahmed.cpv.CircularProgressView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/progressRequests"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        app:cpv_animAutostart="true"
+        app:cpv_indeterminate="true"
+        app:cpv_thickness="2dp"
+        app:cpv_color="@color/main"/>
+
     <ListView android:id="@+id/requestsToFriendship"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
     </ListView>
 
 
@@ -25,6 +34,16 @@
         android:background="@color/material_grey_300"
         android:padding="10dp"
         android:gravity="center"/>
+
+    <com.github.rahatarmanahmed.cpv.CircularProgressView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/progressFriends"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        app:cpv_animAutostart="true"
+        app:cpv_indeterminate="true"
+        app:cpv_thickness="2dp"
+        app:cpv_color="@color/main"/>
 
     <ListView android:id="@+id/friendsList"
         android:layout_width="match_parent"

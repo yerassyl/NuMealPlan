@@ -69,7 +69,21 @@ public class UsersAdapter extends BaseAdapter {
             } catch(ParseException e){
 
             }
-        }else {
+        }else if(object.has("owner")){
+            try {
+                fname = object.getParseObject("owner").fetchIfNeeded().getString("name").toLowerCase();
+                lname = object.getParseObject("owner").fetchIfNeeded().getString("surname").toLowerCase();
+                String mealPlanType = object.getString("type");
+                name = fname.substring(0, 1).toUpperCase() + fname.substring(1) + " " + lname.substring(0, 1).toUpperCase() + lname.substring(1);
+                usernameTextView.setText(name+" | "+mealPlanType.toUpperCase());
+            }catch(ParseException e){
+
+            }
+
+        } else{
+            if (object.getObjectId()==ParseUser.getCurrentUser().getObjectId()){
+
+            }
             fname = object.getString("name").toLowerCase();
             lname = object.getString("surname").toLowerCase();
             name = fname.substring(0,1).toUpperCase()+fname.substring(1)+" "+lname.substring(0,1).toUpperCase()+lname.substring(1);

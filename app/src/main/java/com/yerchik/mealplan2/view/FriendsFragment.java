@@ -13,13 +13,16 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.yerchik.mealplan2.MainActivity;
 import com.yerchik.mealplan2.R;
 import com.yerchik.mealplan2.UserProfileActivity;
+import com.yerchik.mealplan2.adapter.ParseProxyObject;
 import com.yerchik.mealplan2.adapter.UsersAdapter;
 
 import java.util.List;
@@ -31,6 +34,8 @@ public class FriendsFragment extends Fragment {
     UsersAdapter usersAdapter;
     UsersAdapter requestsAdapter;
     ParseUser currentUser;
+
+    CircularProgressView requestsProgress,friendsProgress;
 
     public static FriendsFragment newInstance(int sectionNumber){
         FriendsFragment fragment = new FriendsFragment();
@@ -52,8 +57,8 @@ public class FriendsFragment extends Fragment {
         builder.setView(pbar);
         final AlertDialog dialog = builder.create();
         //dialog.show();
-        currentUser = ParseUser.getCurrentUser();
 
+        currentUser = ParseUser.getCurrentUser();
 
         ParseQuery<ParseUser> friendsQuery = ParseUser.getQuery();
         ParseQuery<ParseObject> friendshipsQuery = ParseQuery.getQuery("Friendship");
@@ -64,10 +69,13 @@ public class FriendsFragment extends Fragment {
             public void done(List<ParseObject> results, com.parse.ParseException e) {
                 if (e==null) {
                     // success
-                    // dialog.dismiss();
+                    MainActivity.userFriendships = results;
+                    MealPlansFragment.getAllOpenMealPlans(getContext()); // launch code for getting all open access mealplans
+                    // hide friendsProgress view
+                    friendsProgress = (CircularProgressView)getActivity().findViewById(R.id.progressFriends);
+                    friendsProgress.setVisibility(View.GONE);
                     // populate list view with friends
                     usersAdapter = new UsersAdapter(results,getContext());
-                    Log.d("yerchik/list", results.size()+"");
                     friendsList = (ListView)getActivity().findViewById(R.id.friendsList);
                     friendsList.setAdapter(usersAdapter);
                     friendsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -94,6 +102,9 @@ public class FriendsFragment extends Fragment {
             @Override
             public void done(List<ParseObject> requests, ParseException e) {
                 if (e==null) {
+                    // hide requestsProgress view
+                    requestsProgress = (CircularProgressView)getActivity().findViewById(R.id.progressRequests);
+                    requestsProgress.setVisibility(View.GONE);
                     requestsAdapter = new UsersAdapter(requests, getContext());
                     requestsList = (ListView)getActivity().findViewById(R.id.requestsToFriendship);
                     requestsList.setAdapter(requestsAdapter);

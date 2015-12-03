@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SearchView;
 
+import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.parse.FindCallback;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -29,6 +30,7 @@ public class SearchFragment extends Fragment {
 
     ListView searchResults;
     UsersAdapter adapter;
+    CircularProgressView searchProgress;
 
     public static SearchFragment newInstance(int sectionNumber){
         SearchFragment fragment = new SearchFragment();
@@ -50,11 +52,14 @@ public class SearchFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         final SearchView searchFriends = (SearchView)getActivity().findViewById(R.id.friendSearchView);
+        searchProgress = (CircularProgressView)getActivity().findViewById(R.id.progressSearch);
         searchFriends.setSubmitButtonEnabled(true);// enable submit button
 
         searchFriends.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String searchFriendStr) {
+                // show SearchProgress view
+                searchProgress.setVisibility(View.VISIBLE);
                 List<ParseQuery<ParseUser>> queries = new ArrayList<>();
                 Log.d("yerchik/login", searchFriendStr);
                 if (searchFriendStr.contains(" ")) {
@@ -93,6 +98,7 @@ public class SearchFragment extends Fragment {
                     @Override
                     public void done(List<ParseUser> list, com.parse.ParseException e) {
                         if (e == null) {
+                            searchProgress.setVisibility(View.GONE);
                             Log.d("yerchik", "users found " + list.toString());
                             adapter = new UsersAdapter(list, getContext());
                             searchResults = (ListView) getActivity().findViewById(R.id.searchResults);

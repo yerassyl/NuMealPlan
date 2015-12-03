@@ -1,5 +1,6 @@
 package com.yerchik.mealplan2.view;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -7,14 +8,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ListView;
 
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.yerchik.mealplan2.MainActivity;
 import com.yerchik.mealplan2.R;
+import com.yerchik.mealplan2.adapter.UsersAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MealPlansFragment extends Fragment {
@@ -22,6 +28,7 @@ public class MealPlansFragment extends Fragment {
 
     Button shareLunch,shareDinner,takeBackLunch,takeBackDinner;
     ParseUser currentUser;
+    public static ListView mealPlansList;
 
     public static MealPlansFragment newInstance(int sectionNumber){
         MealPlansFragment fragment = new MealPlansFragment();
@@ -48,7 +55,7 @@ public class MealPlansFragment extends Fragment {
         shareDinner = (Button)getActivity().findViewById(R.id.shareDinerBtn);
         takeBackLunch = (Button)getActivity().findViewById(R.id.takeBackLunchBtn);
         takeBackDinner = (Button)getActivity().findViewById(R.id.takeBackDinnerBtn);
-
+        mealPlansList = (ListView)getActivity().findViewById(R.id.mealPlans);
         currentUser = ParseUser.getCurrentUser();
 
         // check if user shared any of his meal plans for the day (lucnh/dinner)
@@ -81,24 +88,26 @@ public class MealPlansFragment extends Fragment {
             }
         });
         // load all open access meal plans
-        ParseQuery<ParseUser> friends = ParseUser.getQuery();
-        friends.whereEqualTo("from", currentUser);
-        friends.whereEqualTo("status",1);
-        Log.d("yerchik/mf", friends+"");
+//        ParseQuery<ParseObject> friends = ParseQuery.getQuery("Friendship");
+//        friends.whereEqualTo("from", currentUser);
+//        friends.whereEqualTo("status",1);
+//        Log.d("yerchik/mf", friends+"");
+//
+//
+//        ParseQuery<ParseObject> openMealPlans = ParseQuery.getQuery("MealPlans");
+//        openMealPlans.whereMatchesQuery("owner",friends);
+//        openMealPlans.findInBackground(new FindCallback<ParseObject>() {
+//            @Override
+//            public void done(List<ParseObject> list, ParseException e) {
+//                if (e==null){
+//                    Log.d("yerchik/mp", list+"");
+//                }else {
+//
+//                }
+//
+//            }
+//        });
 
-        ParseQuery<ParseObject> openMealPlans = ParseQuery.getQuery("MealPlans");
-        openMealPlans.whereMatchesQuery("owner",friends);
-        openMealPlans.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> list, ParseException e) {
-                if (e==null){
-                    Log.d("yerchik/mp", list+"");
-                }else {
-
-                }
-
-            }
-        });
 
         // When user wants to share either lunch or dinner
         // When shareLunchBtn is clicked
@@ -176,5 +185,33 @@ public class MealPlansFragment extends Fragment {
             }
         });
 
+    }// END onViewCreated
+
+    // load all open access meal plans that belong to current_user's friends
+    public static void getAllOpenMealPlans(final Context context){
+        final List<ParseObject> mealPlans = new ArrayList<ParseObject>();
+        for(int i=0;i<MainActivity.userFriendships.size();i++){
+            ParseQuery<ParseObject> mealPlan = ParseQuery.getQuery("MealPlans");
+            mealPlan.whereEqualTo("owner", MainActivity.userFriendships.get(i).getParseObject("from"));
+            //Log.d("yerchik/omp",MainActivity.userFriendships.get(i).getParseObject("from").getObjectId()+"");
+            mealPlan.getFirstInBackground(new GetCallback<ParseObject>() {
+                @Override
+                public void done(ParseObject po, ParseException e) {
+                    if (e == null) {
+                        Log.d("yerchik/omp",po.getObjectId()+"");
+                        mealPlans.add(po);
+                    } else {
+
+                    }
+                    UsersAdapter mpAdapter = new UsersAdapter(mealPlans, context );
+                    mealPlansList.setAdapter(mpAdapter);
+
+                }
+            });
+        }
+        Log.d("yerchik/omp", mealPlans + "");
+
     }
+
+
 }
