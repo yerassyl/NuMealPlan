@@ -65,6 +65,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/taken_meal_plans"
+            android:textSize="20sp"
+            android:padding="10dp"
+            android:gravity="center"
+            android:background="@color/material_grey_300"
+            />
+        <ListView android:id="@+id/takenMealPlans"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </ListView>
 
         <TextView
             android:layout_width="match_parent"

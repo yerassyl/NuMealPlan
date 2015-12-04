@@ -2,6 +2,7 @@
 <resources>
 
     <color name="main">#FF6E40</color>
+    <color name="main_darker">#DB4535</color>
     <color name="white">#FFFFFF</color>
     <item name="blue" type="color">#FF33B5E5</item>
 </resources>

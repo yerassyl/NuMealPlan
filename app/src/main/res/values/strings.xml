@@ -47,7 +47,10 @@
     <string name="take_back_lunch">Take back lunch</string>
     <string name="take_back_dinner">Take back dinner</string>
 
+    <string name="taken_meal_plans">Taken meal plans</string>
     <string name="open_access_meal_plans">Open access meal plans</string>
 
+    <string name="used_it">Used it</string>
+    <string name="take_it">Take it</string>
 
 </resources>

@@ -6,6 +6,7 @@ import java.util.Locale;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -17,7 +18,11 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.parse.ParseObject;
 import com.parse.ParseUser;
@@ -201,6 +206,14 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             }
             return null;
         }
+    }
+
+    public void takeMealPlan(View v) {
+        MealPlansFragment.takeMealPlan(v);
+    }
+
+    public void usedMealPlan(View v){
+        MealPlansFragment.usedMealPlan(v);
     }
 
 

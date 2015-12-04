@@ -128,7 +128,7 @@ public class UserProfileActivity extends ActionBarActivity {
     // users can be in friendship
     // or current user has sent request
     // or current user has recieved request
-    public void checkRelationship(){
+    public void checkRelationship() {
         isInFriendship = false;
         // first check if current user has sent friendship request to clicked user
         // if there is instance (currentUser,clickedUser,0)

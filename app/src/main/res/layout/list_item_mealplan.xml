@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView android:id="@+id/mealPlanOwnerName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_weight="5"/>
+
+    <Button android:id="@+id/takeMealPlanBtn"
+        android:layout_width="40dp"
+        android:layout_height="25dp"
+        android:text="@string/take_it"
+        android:textSize="15sp"
+        android:textColor="@color/main"
+        android:background="@drawable/button_transparent_default"
+        android:layout_weight="1"
+        android:layout_margin="5dp"
+        android:onClick="takeMealPlan"/>
+
+</LinearLayout>
