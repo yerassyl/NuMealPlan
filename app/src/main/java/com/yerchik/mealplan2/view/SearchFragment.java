@@ -61,12 +61,12 @@ public class SearchFragment extends Fragment {
                 // show SearchProgress view
                 searchProgress.setVisibility(View.VISIBLE);
                 List<ParseQuery<ParseUser>> queries = new ArrayList<>();
-                Log.d("yerchik/login", searchFriendStr);
+                //Log.d("yerchik/login", searchFriendStr);
                 if (searchFriendStr.contains(" ")) {
                     String[] parts = searchFriendStr.split(" ");
                     String part1 = parts[0];
                     String part2 = parts[1];
-                    Log.d("yerchik/login", "name: " + part1 + ", surname: " + part2);
+                    //Log.d("yerchik/login", "name: " + part1 + ", surname: " + part2);
 
                     ParseQuery<ParseUser> query1 = ParseUser.getQuery();
                     query1.whereStartsWith("name", part1);
@@ -99,7 +99,7 @@ public class SearchFragment extends Fragment {
                     public void done(List<ParseUser> list, com.parse.ParseException e) {
                         if (e == null) {
                             searchProgress.setVisibility(View.GONE);
-                            Log.d("yerchik", "users found " + list.toString());
+                            //Log.d("yerchik", "users found " + list.toString());
                             adapter = new UsersAdapter(list, getContext());
                             searchResults = (ListView) getActivity().findViewById(R.id.searchResults);
                             searchResults.setAdapter(adapter);
@@ -108,7 +108,7 @@ public class SearchFragment extends Fragment {
                                 @Override
                                 public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                                     ParseObject clickedUser = (ParseUser) adapter.getItem(position);
-                                    Log.d("yerchik", "found " + clickedUser.getString("name"));
+                                    //Log.d("yerchik", "found " + clickedUser.getString("name"));
                                     Intent intent = new Intent(getContext(), UserProfileActivity.class);
                                     intent.putExtra("userId", clickedUser.getObjectId());
                                     startActivity(intent);
@@ -116,7 +116,7 @@ public class SearchFragment extends Fragment {
                             });
 
                         } else {
-                            Log.d("yerchik", "nothing found");
+                            //Log.d("yerchik", "nothing found");
                         }
                     }
                 });
@@ -125,7 +125,7 @@ public class SearchFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String s) {
-                Log.d("yerchik/search", "changed");
+                //Log.d("yerchik/search", "changed");
                 return false;
             }
         });

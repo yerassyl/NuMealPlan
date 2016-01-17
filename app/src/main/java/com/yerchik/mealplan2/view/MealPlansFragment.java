@@ -1,5 +1,6 @@
 package com.yerchik.mealplan2.view;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
+
+import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -21,12 +24,14 @@ import com.yerchik.mealplan2.R;
 import com.yerchik.mealplan2.adapter.MealPlanAdapter;
 import com.yerchik.mealplan2.adapter.TakenMealPlanAdapter;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MealPlansFragment extends Fragment {
     private static final String FRAGMENT_NAME = "MealPlans";
 
+    public static CircularProgressView takenMealPlanProgress,openMealPlanProgress;
     Button shareLunch,shareDinner,takeBackLunch,takeBackDinner;
     ParseUser currentUser;
     public static ListView mealPlansList;
@@ -88,6 +93,9 @@ public class MealPlansFragment extends Fragment {
                             if (mp.getString("type").equals("lunch")) {
                                 takeBackLunch.setVisibility(View.VISIBLE);
                                 shareLunch.setVisibility(View.GONE);
+                                // test time
+                                Log.d("yerchik/time",mp.getCreatedAt().toString());
+                                //Log.d("yerchik/time", );
                             } else {
                                 // dinner
                                 takeBackDinner.setVisibility(View.VISIBLE);
@@ -113,6 +121,10 @@ public class MealPlansFragment extends Fragment {
                     takenMealPlansPOList = list;
                     takenMealPlanAdapter = new TakenMealPlanAdapter(takenMealPlansPOList,getContext());
                     takenMealPlansList.setAdapter(takenMealPlanAdapter);
+
+                    // hide circular progress view
+                    takenMealPlanProgress = (CircularProgressView)getActivity().findViewById(R.id.progressTakeMealPlans);
+                    takenMealPlanProgress.setVisibility(View.GONE);
                 }else {
 
                 }
@@ -122,7 +134,7 @@ public class MealPlansFragment extends Fragment {
 //        ParseQuery<ParseObject> friends = ParseQuery.getQuery("Friendship");
 //        friends.whereEqualTo("from", currentUser);
 //        friends.whereEqualTo("status",1);
-//        Log.d("yerchik/mf", friends+"");
+//        //Log.d("yerchik/mf", friends+"");
 //
 //
 //        ParseQuery<ParseObject> openMealPlans = ParseQuery.getQuery("MealPlans");
@@ -131,7 +143,7 @@ public class MealPlansFragment extends Fragment {
 //            @Override
 //            public void done(List<ParseObject> list, ParseException e) {
 //                if (e==null){
-//                    Log.d("yerchik/mp", list+"");
+//                    //Log.d("yerchik/mp", list+"");
 //                }else {
 //
 //                }
@@ -250,27 +262,32 @@ public class MealPlansFragment extends Fragment {
     }// END onViewCreated
 
     // load all open access meal plans that belong to current_user's friends
-    public static void getAllOpenMealPlans(final Context context){
+    public static void getAllOpenMealPlans(final Context context, final Activity activity){
 
         for(int i=0;i<MainActivity.userFriendships.size();i++){
             final ParseQuery<ParseObject> mealPlan = ParseQuery.getQuery("MealPlans");
 
+            // create temp adapter
+            // fix
             ParseObject tempPO = new ParseObject("MealPlans");
             openMealPlansPOList.add(tempPO);
 
             openMealPlanAdapter = new MealPlanAdapter(openMealPlansPOList, context);
             mealPlansList.setAdapter(openMealPlanAdapter);
             openMealPlansPOList.remove(tempPO);
+            // end fix
 
             mealPlan.whereEqualTo("owner", MainActivity.userFriendships.get(i).getParseObject("from"));
+            //mealPlan.whereLessThanOrEqualTo("created_at",);
             mealPlan.whereEqualTo("isTaken",0);
-            //Log.d("yerchik/omp",MainActivity.userFriendships.get(i).getParseObject("from").getObjectId()+"");
+            ////Log.d("yerchik/omp",MainActivity.userFriendships.get(i).getParseObject("from").getObjectId()+"");
             mealPlan.findInBackground(new FindCallback<ParseObject>() {
                 @Override
                 public void done(List<ParseObject> po, ParseException e) {
                     if (e == null) {
-                        Log.d("yerchik/d",po+"");
+                        ////Log.d("yerchik/d",po+"");
                         openMealPlansPOList.addAll(po);
+                        MealPlansFragment.hideOpenMealPlanCircularProgress(activity);
                     } else {
 
                     }
@@ -286,7 +303,7 @@ public class MealPlansFragment extends Fragment {
         ListView listView = (ListView) parentRow.getParent();
         final int position = listView.getPositionForView(parentRow);
         ParseObject clickedMealPlan = (ParseObject)openMealPlanAdapter.getItem(position);
-        Log.d("yerchik/fr", "take it: " + clickedMealPlan.getObjectId());
+        //Log.d("yerchik/fr", "take it: " + clickedMealPlan.getObjectId());
         clickedMealPlan.put("isTaken", 1);
         clickedMealPlan.put("taker", ParseUser.getCurrentUser());
         clickedMealPlan.saveEventually();
@@ -335,5 +352,10 @@ public class MealPlansFragment extends Fragment {
         dialog.show();
     }
 
+    public static void hideOpenMealPlanCircularProgress(Activity activity){
+        // hide circular progress view
+        openMealPlanProgress = (CircularProgressView)activity.findViewById(R.id.progressOpenMealPlans);
+        openMealPlanProgress.setVisibility(View.GONE);
+    }
 
 }

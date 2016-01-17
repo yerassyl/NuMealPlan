@@ -57,7 +57,9 @@ public class TakenMealPlanAdapter extends BaseAdapter {
         TextView usernameTextView = (TextView) convertView.findViewById(R.id.takenMealPlanID);
         try {
             String mealPlanId = object.getParseObject("owner").fetchIfNeeded().getString("username");
-            usernameTextView.setText(mealPlanId);
+            String mealPlanType = object.getString("type");
+
+            usernameTextView.setText(mealPlanId +" | "+ mealPlanType.toUpperCase());
         }catch(ParseException e) {
 
         }

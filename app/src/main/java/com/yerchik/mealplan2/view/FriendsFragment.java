@@ -50,7 +50,7 @@ public class FriendsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("yerchik", "friends fragment is created");
+        ////Log.d("yerchik", "friends fragment is created");
         // start spinner to show that search is going on
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         ProgressBar pbar = new ProgressBar(getContext());
@@ -60,6 +60,7 @@ public class FriendsFragment extends Fragment {
 
         currentUser = ParseUser.getCurrentUser();
 
+        // grab all friendships
         ParseQuery<ParseUser> friendsQuery = ParseUser.getQuery();
         ParseQuery<ParseObject> friendshipsQuery = ParseQuery.getQuery("Friendship");
         friendshipsQuery.whereEqualTo("to",currentUser);
@@ -70,10 +71,12 @@ public class FriendsFragment extends Fragment {
                 if (e==null) {
                     // success
                     MainActivity.userFriendships = results;
-                    MealPlansFragment.getAllOpenMealPlans(getContext()); // launch code for getting all open access mealplans
+                    MealPlansFragment.getAllOpenMealPlans(getContext(),getActivity()); // launch code for getting all open access mealplans
+
                     // hide friendsProgress view
                     friendsProgress = (CircularProgressView)getActivity().findViewById(R.id.progressFriends);
                     friendsProgress.setVisibility(View.GONE);
+
                     // populate list view with friends
                     usersAdapter = new UsersAdapter(results,getContext());
                     friendsList = (ListView)getActivity().findViewById(R.id.friendsList);
@@ -81,7 +84,7 @@ public class FriendsFragment extends Fragment {
                     friendsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                            Log.d("yerchik", "pos: "+position);
+                            //Log.d("yerchik", "pos: "+position);
                             showUserProfile(position, usersAdapter);
                         }
                     });
@@ -123,7 +126,7 @@ public class FriendsFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d("yerchik", "on friends view create");
+        ////Log.d("yerchik", "on friends view create");
         View friendsView = inflater.inflate(R.layout.fragment_friends, container, false);
         return friendsView;
     }
@@ -141,7 +144,7 @@ public class FriendsFragment extends Fragment {
         // we need to get User object from it
         if (clickedUser.has("from")){
             intent.putExtra("userId", clickedUser.getParseObject("from").getObjectId());
-            Log.d("yerchik", "has:" + clickedUser.getParseObject("from").getObjectId());
+            ////Log.d("yerchik", "has:" + clickedUser.getParseObject("from").getObjectId());
         }else {
             intent.putExtra("userId", clickedUser.getObjectId());
         }

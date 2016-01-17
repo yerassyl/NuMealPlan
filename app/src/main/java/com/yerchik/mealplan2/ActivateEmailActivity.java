@@ -24,7 +24,7 @@ public class ActivateEmailActivity extends ActionBarActivity {
 
         Intent intent = getIntent();
         String emailStr = intent.getStringExtra("email");
-        Log.d("yerchik/email", emailStr);
+        //Log.d("yerchik/email", emailStr);
         TextView emailTxtView = (TextView)findViewById(R.id.activateEmail);
         emailTxtView.setText(emailStr);
     }

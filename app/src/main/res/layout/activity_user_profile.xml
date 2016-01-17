@@ -16,7 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_weight="1">
+            android:layout_weight="3">
 
             <TextView android:id="@+id/profileName"
                 android:layout_width="wrap_content"
@@ -24,7 +24,7 @@
                 android:textSize="24sp"
                 />
             <TextView android:id="@+id/profileEmail"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp" />
         </LinearLayout>
@@ -33,7 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_weight="1">
+            android:layout_weight="2">
 
             <TextView android:id="@+id/friendsCount"
                 android:layout_width="wrap_content"

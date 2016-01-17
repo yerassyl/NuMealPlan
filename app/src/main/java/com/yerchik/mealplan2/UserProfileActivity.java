@@ -165,7 +165,7 @@ public class UserProfileActivity extends ActionBarActivity {
             @Override
             public void done(final ParseObject friendshipRelation, ParseException e) {
                 if (e == null) {
-                    Log.d("yerchik/request", "found something: " + friendshipRelation);
+                    //Log.d("yerchik/request", "found something: " + friendshipRelation);
 
                     if ((int)friendshipRelation.getNumber("status")==1) {
                         // request IS approved and current user is in friendship with clicked user
@@ -176,7 +176,7 @@ public class UserProfileActivity extends ActionBarActivity {
                         // if request is sent by current user
                         // notify that request is sent
                         requestSentView.setVisibility(View.VISIBLE);
-                        Log.d("yerchik/request", "i sent request");
+                        //Log.d("yerchik/request", "i sent request");
                     }else {
                         // else request is sent by clicked user
                         // show "accept request" button
@@ -199,11 +199,11 @@ public class UserProfileActivity extends ActionBarActivity {
                                 requestSentView.setText(Name+" is your friend");
                             }
                         });
-                        Log.d("yerchik/request", "clicked user sent the request");
+                        //Log.d("yerchik/request", "clicked user sent the request");
                     }
                 } else {
                     // request has NOT been sent yet
-                    Log.d("yerchik/request", "no request sent");
+                    //Log.d("yerchik/request", "no request sent");
                     requestFriendshipBtn.setVisibility(View.VISIBLE);
                 }
 
