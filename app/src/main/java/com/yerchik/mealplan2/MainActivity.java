@@ -61,7 +61,14 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         // check if user is logged in
         currentUser = ParseUser.getCurrentUser();
         if (currentUser != null) {
-            // stay at HomePage
+            // and check if user activated his email
+            if (!currentUser.getBoolean("emailVerified")){
+                // redirect to activity that tells that user has to activate his email
+                finish();
+                Intent intent = new Intent(this,ActivateEmailActivity.class);
+                intent.putExtra("email", currentUser.getString("email"));
+                startActivity(intent);
+            }
         } else {
             // show the signup or login screen
             finish();

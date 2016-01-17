@@ -53,4 +53,8 @@
     <string name="used_it">Used it</string>
     <string name="take_it">Take it</string>
 
+    <string name="title_activity_activate_email">Email Activation</string>
+    <string name="activation_email_sent">Your activation email has been sent to: </string>
+    <string name="verify_email">Please activate your email in order to use Meal Plan saver application. </string>
+
 </resources>

@@ -1,6 +1,8 @@
 package com.yerchik.mealplan2.view;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -153,6 +155,7 @@ public class MealPlansFragment extends Fragment {
                     mealPlan.saveEventually();
                     shareLunch.setVisibility(View.GONE);
                     takeBackLunch.setVisibility(View.VISIBLE);
+                    incrementSharedMealPlans();
                 }
             }
         });
@@ -171,6 +174,7 @@ public class MealPlansFragment extends Fragment {
                     mealPlan.saveEventually();
                     shareDinner.setVisibility(View.GONE);
                     takeBackDinner.setVisibility(View.VISIBLE);
+                    incrementSharedMealPlans();
                 }
             }
         });
@@ -184,14 +188,26 @@ public class MealPlansFragment extends Fragment {
                     ParseQuery<ParseObject> mealPlan = ParseQuery.getQuery("MealPlans");
                     mealPlan.whereEqualTo("owner", currentUser);
                     mealPlan.whereEqualTo("type", "lunch");
+                    mealPlan.whereEqualTo("isTaken", 0);
                     mealPlan.setLimit(1);
                     mealPlan.findInBackground(new FindCallback<ParseObject>() {
                         @Override
                         public void done(List<ParseObject> mp, ParseException e) {
                             // delete it
-                            mp.get(0).deleteEventually();
-                            takeBackLunch.setVisibility(View.GONE);
-                            shareLunch.setVisibility(View.VISIBLE);
+                            if (e==null){
+                                if (mp!=null && mp.size()!=0){
+                                    mp.get(0).deleteEventually();
+                                    takeBackLunch.setVisibility(View.GONE);
+                                    shareLunch.setVisibility(View.VISIBLE);
+                                    decrementSharedMealPlans();
+                                }
+                                else {
+                                    showAlertMessage("Sorry!","Your meal plan has already been taken by someone","OK");
+                                }
+                            }else {
+
+                            }
+
                         }
                     });
                 }
@@ -205,13 +221,25 @@ public class MealPlansFragment extends Fragment {
                     ParseQuery<ParseObject> mealPlan = ParseQuery.getQuery("MealPlans");
                     mealPlan.whereEqualTo("owner", currentUser);
                     mealPlan.whereEqualTo("type", "dinner");
+                    mealPlan.whereEqualTo("isTaken",0);
                     mealPlan.setLimit(1);
                     mealPlan.findInBackground(new FindCallback<ParseObject>() {
                         @Override
                         public void done(List<ParseObject> mp, ParseException e) {
-                            mp.get(0).deleteEventually();
-                            takeBackDinner.setVisibility(View.GONE);
-                            shareDinner.setVisibility(View.VISIBLE);
+                            if (e==null){
+                                if (mp!=null && mp.size()!=0){
+                                    mp.get(0).deleteEventually();
+                                    takeBackDinner.setVisibility(View.GONE);
+                                    shareDinner.setVisibility(View.VISIBLE);
+                                    decrementSharedMealPlans();
+                                } else {
+                                    showAlertMessage("Sorry!","Your meal plan has already been taken by someone","OK");
+                                }
+
+                            }else {
+
+                            }
+
                         }
                     });
                 }
@@ -266,6 +294,7 @@ public class MealPlansFragment extends Fragment {
         takenMealPlansPOList.add(clickedMealPlan);
         //openMealPlansPO.remove(position);
         takenMealPlanAdapter.notifyDataSetChanged();
+
         openMealPlansPOList.remove(clickedMealPlan);
         openMealPlanAdapter.notifyDataSetChanged();
     }
@@ -281,6 +310,30 @@ public class MealPlansFragment extends Fragment {
         takenMealPlanAdapter.notifyDataSetChanged();
     }
 
+    public void incrementSharedMealPlans(){
+        currentUser.increment("shared_count");
+        currentUser.saveEventually();
+    }
+    public void decrementSharedMealPlans(){
+        currentUser.increment("shared_count",-1);
+        currentUser.saveEventually();
+    }
+
+    // alert message to be used in findInBackground callback
+    public void showAlertMessage(String title,String message, String positiveBtn){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.setPositiveButton(positiveBtn, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //close dialog
+                dialogInterface.dismiss();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
 
 
 }

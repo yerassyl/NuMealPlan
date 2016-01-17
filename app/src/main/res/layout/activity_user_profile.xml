@@ -43,11 +43,14 @@
 
             <TextView android:id="@+id/sharedCount"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                />
 
             <TextView android:id="@+id/takenCount"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                />
         </LinearLayout>
 
     </LinearLayout>
