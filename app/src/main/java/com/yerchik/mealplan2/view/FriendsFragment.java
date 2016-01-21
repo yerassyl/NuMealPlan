@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,10 +26,14 @@ import com.yerchik.mealplan2.UserProfileActivity;
 import com.yerchik.mealplan2.adapter.ParseProxyObject;
 import com.yerchik.mealplan2.adapter.UsersAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FriendsFragment extends Fragment {
     private static final String FRAGMENT_NAME = "Friends";
+
+    public static List<ParseObject> requestsPOList;
+    public static List<ParseObject> friendshipsPOList;
 
     ListView requestsList,friendsList;
     UsersAdapter usersAdapter;
@@ -36,6 +41,8 @@ public class FriendsFragment extends Fragment {
     ParseUser currentUser;
 
     CircularProgressView requestsProgress,friendsProgress;
+
+    SwipeRefreshLayout swipeRefreshFriends;
 
     public static FriendsFragment newInstance(int sectionNumber){
         FriendsFragment fragment = new FriendsFragment();
@@ -48,88 +55,44 @@ public class FriendsFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        ////Log.d("yerchik", "friends fragment is created");
-        // start spinner to show that search is going on
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        ProgressBar pbar = new ProgressBar(getContext());
-        builder.setView(pbar);
-        final AlertDialog dialog = builder.create();
-        //dialog.show();
+    public void onViewCreated(View view, Bundle savedInstanceState) {
 
+        requestsPOList = new ArrayList<ParseObject>();
+        friendshipsPOList = new ArrayList<ParseObject>();
         currentUser = ParseUser.getCurrentUser();
 
-        // grab all friendships
-        ParseQuery<ParseUser> friendsQuery = ParseUser.getQuery();
-        ParseQuery<ParseObject> friendshipsQuery = ParseQuery.getQuery("Friendship");
-        friendshipsQuery.whereEqualTo("to",currentUser);
-        friendshipsQuery.whereEqualTo("status",1);
-        friendshipsQuery.findInBackground(new FindCallback<ParseObject>() {
+        requestsProgress = (CircularProgressView) getActivity().findViewById(R.id.progressRequests);
+        friendsProgress = (CircularProgressView) getActivity().findViewById(R.id.progressFriends);
+
+        requestsList = (ListView) getActivity().findViewById(R.id.requestsToFriendship);
+        friendsList = (ListView) getActivity().findViewById(R.id.friendsList);
+
+
+
+        getAllFriendships();
+        getAllIncomingRequests();
+
+        swipeRefreshFriends = (SwipeRefreshLayout)getActivity().findViewById(R.id.swipeRefreshFriends);
+        // set swipe to refresh listener
+        swipeRefreshFriends.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void done(List<ParseObject> results, com.parse.ParseException e) {
-                if (e==null) {
-                    // success
-                    MainActivity.userFriendships = results;
-                    MealPlansFragment.getAllOpenMealPlans(getContext(),getActivity()); // launch code for getting all open access mealplans
-
-                    // hide friendsProgress view
-                    friendsProgress = (CircularProgressView)getActivity().findViewById(R.id.progressFriends);
-                    friendsProgress.setVisibility(View.GONE);
-
-                    // populate list view with friends
-                    usersAdapter = new UsersAdapter(results,getContext());
-                    friendsList = (ListView)getActivity().findViewById(R.id.friendsList);
-                    friendsList.setAdapter(usersAdapter);
-                    friendsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                            //Log.d("yerchik", "pos: "+position);
-                            showUserProfile(position, usersAdapter);
-                        }
-                    });
-
-                } else {
-                    dialog.dismiss();
-                }
+            public void onRefresh() {
+                getAllFriendships();
+                getAllIncomingRequests();
+                swipeRefreshFriends.setRefreshing(false);
             }
+
         });
 
 
-        // GRAB ALL INCOMING FRIENDSHIP REQUESTS /////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////
-        ParseQuery<ParseObject> incomingFriendshipRequests = ParseQuery.getQuery("Friendship");
-        incomingFriendshipRequests.whereEqualTo("to", currentUser );
-        incomingFriendshipRequests.whereEqualTo("status", 0);
-        incomingFriendshipRequests.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> requests, ParseException e) {
-                if (e==null) {
-                    // hide requestsProgress view
-                    requestsProgress = (CircularProgressView)getActivity().findViewById(R.id.progressRequests);
-                    requestsProgress.setVisibility(View.GONE);
-                    requestsAdapter = new UsersAdapter(requests, getContext());
-                    requestsList = (ListView)getActivity().findViewById(R.id.requestsToFriendship);
-                    requestsList.setAdapter(requestsAdapter);
-                    requestsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                            showUserProfile(position, requestsAdapter);
-                        }
-                    });
-                } else {
-
-                }
-            }
-        });
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ////Log.d("yerchik", "on friends view create");
         View friendsView = inflater.inflate(R.layout.fragment_friends, container, false);
         return friendsView;
     }
+
 
     // starts UserPofileActivity and passes user information to it
     // position: position of list item in list view (passed in onItemClickListenre event
@@ -144,11 +107,74 @@ public class FriendsFragment extends Fragment {
         // we need to get User object from it
         if (clickedUser.has("from")){
             intent.putExtra("userId", clickedUser.getParseObject("from").getObjectId());
-            ////Log.d("yerchik", "has:" + clickedUser.getParseObject("from").getObjectId());
         }else {
             intent.putExtra("userId", clickedUser.getObjectId());
         }
         startActivity(intent);
     }
+
+    public void getAllIncomingRequests(){
+        // GRAB ALL INCOMING FRIENDSHIP REQUESTS /////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        ParseQuery<ParseObject> incomingFriendshipRequests = ParseQuery.getQuery("Friendship");
+        incomingFriendshipRequests.whereEqualTo("to", currentUser );
+        incomingFriendshipRequests.whereEqualTo("status", 0);
+        incomingFriendshipRequests.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> requests, ParseException e) {
+                if (e == null) {
+                    // hide requestsProgress view
+                    requestsProgress.setVisibility(View.GONE);
+                    requestsPOList.clear();
+                    requestsPOList.addAll(requests);
+                    requestsAdapter = new UsersAdapter(requestsPOList, getContext());
+                    requestsList.setAdapter(requestsAdapter);
+                    requestsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                            showUserProfile(position, requestsAdapter);
+                        }
+                    });
+                } else {
+
+                }
+            }
+        });
+    }
+
+    public void getAllFriendships(){
+        // grab all friendships
+        ParseQuery<ParseUser> friendsQuery = ParseUser.getQuery();
+        ParseQuery<ParseObject> friendshipsQuery = ParseQuery.getQuery("Friendship");
+        friendshipsQuery.whereEqualTo("to",currentUser);
+        friendshipsQuery.whereEqualTo("status",1);
+        friendshipsQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> results, com.parse.ParseException e) {
+                if (e == null) {
+                    friendshipsPOList.clear();
+                    friendshipsPOList.addAll(results);
+                    MainActivity.userFriendships = results;
+                    MealPlansFragment.getAllOpenMealPlans(getContext(), getActivity()); // launch code for getting all open access mealplans
+
+                    // hide friendsProgress view
+                    friendsProgress.setVisibility(View.GONE);
+
+                    // populate list view with friends
+                    usersAdapter = new UsersAdapter(friendshipsPOList, getContext());
+                    friendsList.setAdapter(usersAdapter);
+                    friendsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                            showUserProfile(position, usersAdapter);
+                        }
+                    });
+
+                } else {
+                }
+            }
+        });
+    }
+
 
 }
