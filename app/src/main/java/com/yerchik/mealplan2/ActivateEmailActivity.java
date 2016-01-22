@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.parse.ParseUser;
@@ -16,6 +18,7 @@ public class ActivateEmailActivity extends ActionBarActivity {
 
     protected ProgressDialog dialogHome;
 
+    Button activated;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,9 +27,19 @@ public class ActivateEmailActivity extends ActionBarActivity {
 
         Intent intent = getIntent();
         String emailStr = intent.getStringExtra("email");
-        //Log.d("yerchik/email", emailStr);
         TextView emailTxtView = (TextView)findViewById(R.id.activateEmail);
         emailTxtView.setText(emailStr);
+
+        activated = (Button)findViewById(R.id.activated);
+        activated.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(ActivateEmailActivity.this, MainActivity.class);
+                startActivity(i);
+                finish();
+            }
+        });
+
     }
 
     @Override

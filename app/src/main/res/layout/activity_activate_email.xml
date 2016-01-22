@@ -25,4 +25,14 @@
         android:text="@string/verify_email"
         android:textSize="20sp"/>
 
+    <Button
+        android:id="@+id/activated"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/button_custom"
+        android:text="@string/activated"
+        android:textColor="@color/white"
+        android:textSize="20sp" />
+
 </LinearLayout>

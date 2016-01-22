@@ -24,7 +24,10 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.yerchik.mealplan2.view.FriendsFragment;
 import com.yerchik.mealplan2.view.MealPlansFragment;
@@ -53,28 +56,49 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     ParseUser currentUser;
     public static List<ParseObject> userFriendships;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Log.d("yerchik", "on create");
 
-        // check if user is logged in
+
         currentUser = ParseUser.getCurrentUser();
-        if (currentUser != null) {
-            // and check if user activated his email
-//            if (!currentUser.getBoolean("emailVerified")){
-//                // redirect to activity that tells that user has to activate his email
-//                finish();
-//                Intent intent = new Intent(this,ActivateEmailActivity.class);
-//                intent.putExtra("email", currentUser.getString("email"));
-//                startActivity(intent);
-//            }
+
+        // check if user is logged in and activated his email
+        // currentUser.getBoolean("emailVerified") is not reliable, since it takes data from local session
+        if (currentUser!=null) {
+            ParseQuery<ParseUser> currUser = ParseUser.getQuery();
+            currUser.whereEqualTo("objectId", currentUser.getObjectId());
+            currUser.setLimit(1);
+            currUser.findInBackground(new FindCallback<ParseUser>() {
+                @Override
+                public void done(List<ParseUser> list, ParseException e) {
+                    if (e == null) {
+                        if (!list.isEmpty()) {
+                            if (!list.get(0).getBoolean("emailVerified")) {
+                                Log.d("yerchik/email", "not verified");
+                                // redirect to activity that tells that user has to activate his email
+                                Intent intent = new Intent(getApplicationContext(), ActivateEmailActivity.class);
+                                intent.putExtra("email", currentUser.getString("email"));
+                                startActivity(intent);
+                                finish();
+                            }
+                        }
+                    } else {
+
+                    }
+                }
+            });
         } else {
             // show the signup or login screen
-            finish();
             Intent intent = new Intent(this,LoginActivity.class);
             startActivity(intent);
+            finish();
         }
+
+
         try {
             currentUserName = currentUser.getString("name");
         }catch(NullPointerException e){

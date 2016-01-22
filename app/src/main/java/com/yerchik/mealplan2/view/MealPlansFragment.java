@@ -311,54 +311,56 @@ public class MealPlansFragment extends Fragment {
     // load all open access meal plans that belong to current_user's friends
     public static void getAllOpenMealPlans(final Context context, final Activity activity){
         MealPlansFragment.showOpenMealPlanCircularProgress(activity);
-        if (MainActivity.userFriendships.size()==0){
-            MealPlansFragment.hideOpenMealPlanCircularProgress(activity);
-        }
-        for(int i=0;i<MainActivity.userFriendships.size();i++){
-            final ParseQuery<ParseObject> mealPlan = ParseQuery.getQuery("MealPlans");
+        if (MainActivity.userFriendships!=null) {
+            if (MainActivity.userFriendships.size() == 0) {
+                MealPlansFragment.hideOpenMealPlanCircularProgress(activity);
+            }
+            for (int i = 0; i < MainActivity.userFriendships.size(); i++) {
+                final ParseQuery<ParseObject> mealPlan = ParseQuery.getQuery("MealPlans");
 
-            // create temp adapter
-            // fix
-            ParseObject tempPO = new ParseObject("MealPlans");
-            openMealPlansPOList.add(tempPO);
+                // create temp adapter
+                // fix
+                ParseObject tempPO = new ParseObject("MealPlans");
+                openMealPlansPOList.add(tempPO);
 
-            openMealPlanAdapter = new MealPlanAdapter(openMealPlansPOList, context);
-            mealPlansList.setAdapter(openMealPlanAdapter);
-            openMealPlansPOList.remove(tempPO);
-            // end fix
+                openMealPlanAdapter = new MealPlanAdapter(openMealPlansPOList, context);
+                mealPlansList.setAdapter(openMealPlanAdapter);
+                openMealPlansPOList.remove(tempPO);
+                // end fix
 
-            Calendar cal = new GregorianCalendar();
-            cal.set(Calendar.HOUR_OF_DAY, 0);
-            cal.set(Calendar.MINUTE, 0);
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
+                Calendar cal = new GregorianCalendar();
+                cal.set(Calendar.HOUR_OF_DAY, 0);
+                cal.set(Calendar.MINUTE, 0);
+                cal.set(Calendar.SECOND, 0);
+                cal.set(Calendar.MILLISECOND, 0);
 
-            final Date today = cal.getTime();
+                final Date today = cal.getTime();
 
-            cal.add(Calendar.DAY_OF_MONTH, 1); // add one day to get start of tomorrow
+                cal.add(Calendar.DAY_OF_MONTH, 1); // add one day to get start of tomorrow
 
-            // start of tomorrow
-            Date tomorrow = cal.getTime();
+                // start of tomorrow
+                Date tomorrow = cal.getTime();
 
-            mealPlan.whereEqualTo("owner", MainActivity.userFriendships.get(i).getParseObject("from"));
-            mealPlan.whereGreaterThan("createdAt", today );
-            mealPlan.whereLessThan("createdAt", tomorrow);
-            mealPlan.whereEqualTo("isTaken",0);
+                mealPlan.whereEqualTo("owner", MainActivity.userFriendships.get(i).getParseObject("from"));
+                mealPlan.whereGreaterThan("createdAt", today);
+                mealPlan.whereLessThan("createdAt", tomorrow);
+                mealPlan.whereEqualTo("isTaken", 0);
 
-            mealPlan.findInBackground(new FindCallback<ParseObject>() {
-                @Override
-                public void done(List<ParseObject> po, ParseException e) {
-                    if (e == null) {
-                        openMealPlansPOList.clear();
-                        openMealPlansPOList.addAll(po);
-                        MealPlansFragment.hideOpenMealPlanCircularProgress(activity);
-                    } else {
-                        MealPlansFragment.hideOpenMealPlanCircularProgress(activity);
+                mealPlan.findInBackground(new FindCallback<ParseObject>() {
+                    @Override
+                    public void done(List<ParseObject> po, ParseException e) {
+                        if (e == null) {
+                            openMealPlansPOList.clear();
+                            openMealPlansPOList.addAll(po);
+                            MealPlansFragment.hideOpenMealPlanCircularProgress(activity);
+                        } else {
+                            MealPlansFragment.hideOpenMealPlanCircularProgress(activity);
+                        }
+                        openMealPlanAdapter.notifyDataSetChanged();
+
                     }
-                    openMealPlanAdapter.notifyDataSetChanged();
-
-                }
-            });
+                });
+            }
         }
 
     }
