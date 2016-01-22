@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -23,6 +24,7 @@ public class SignupActivity extends Activity {
     protected EditText fnameView,lnameView,emailView,idNumberView,passwordView,passwordConfirmView;
     protected Button signUpBtnView;
     protected ProgressDialog dialogSignup;
+    protected CheckBox hasMealPlan;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +39,7 @@ public class SignupActivity extends Activity {
         passwordView = (EditText)findViewById(R.id.passwordSignup);
         passwordConfirmView = (EditText)findViewById(R.id.passwordConfirmSignup);
         signUpBtnView = (Button)findViewById(R.id.signupBtnSignup);
+        hasMealPlan = (CheckBox)findViewById(R.id.hasMealPlan);
 
         // when sign up btn is clicked
         signUpBtnView.setOnClickListener(new View.OnClickListener() {
@@ -49,6 +52,7 @@ public class SignupActivity extends Activity {
                 String idNumberStr = idNumberView.getText().toString().trim();
                 String passwordStr = passwordView.getText().toString().trim();
                 String passwordConfirmStr = passwordConfirmView.getText().toString().trim();
+                boolean hasMealPlanbool = hasMealPlan.isChecked();
 
                 // check if user provided all required data
                 if (fnameStr.equals("") || lnameStr.equals("") || emailStr.equals("") || idNumberStr.equals("") || passwordStr.equals("") || passwordConfirmStr.equals("")) {
@@ -91,6 +95,7 @@ public class SignupActivity extends Activity {
                     user.put("friend_count", 0);
                     user.put("shared_count", 0);
                     user.put("taken_count", 0);
+                    user.put("has_meal_plan", hasMealPlanbool);
                     user.signUpInBackground(new SignUpCallback() {
                         public void done(ParseException e) {
                             if (e == null) {

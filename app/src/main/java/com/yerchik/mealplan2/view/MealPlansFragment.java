@@ -100,182 +100,192 @@ public class MealPlansFragment extends Fragment {
         openMealPlansPOList = new ArrayList<ParseObject>();
         takenMealPlansPOList = new ArrayList<ParseObject>();
 
-        // check if user shared any of his meal plans for the day (lucnh/dinner)
-        ParseQuery<ParseObject> checkIfShared = ParseQuery.getQuery("MealPlans");
-        checkIfShared.whereEqualTo("owner", currentUser);
-        checkIfShared.setLimit(2);
-        checkIfShared.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> mealPlans, ParseException e) {
-                if (e == null) {
-                    ParseObject mp;
-                    shareLunch.setVisibility(View.VISIBLE);
-                    shareDinner.setVisibility(View.VISIBLE);
-                    for (int i = 0; i < mealPlans.size(); i++) {
-                        mp = mealPlans.get(i);
-                        if (mp != null) {
-                            if (mp.getString("type").equals("lunch")) {
-                                takeBackLunch.setVisibility(View.VISIBLE);
-                                shareLunch.setVisibility(View.GONE);
-                            } else {
-                                // dinner
-                                takeBackDinner.setVisibility(View.VISIBLE);
-                                shareDinner.setVisibility(View.GONE);
+        // first check if user is subscribed to meal plan
+        if (!currentUser.getBoolean("has_meal_plan")){
+            shareLunch.setVisibility(View.GONE);
+            shareDinner.setVisibility(View.GONE);
+            takeBackLunch.setVisibility(View.GONE);
+            takeBackDinner.setVisibility(View.GONE);
+        }else {
+            // check if user shared any of his meal plans for the day (lucnh/dinner)
+            ParseQuery<ParseObject> checkIfShared = ParseQuery.getQuery("MealPlans");
+            checkIfShared.whereEqualTo("owner", currentUser);
+            checkIfShared.setLimit(2);
+            checkIfShared.findInBackground(new FindCallback<ParseObject>() {
+                @Override
+                public void done(List<ParseObject> mealPlans, ParseException e) {
+                    if (e == null) {
+                        ParseObject mp;
+                        shareLunch.setVisibility(View.VISIBLE);
+                        shareDinner.setVisibility(View.VISIBLE);
+                        for (int i = 0; i < mealPlans.size(); i++) {
+                            mp = mealPlans.get(i);
+                            if (mp != null) {
+                                if (mp.getString("type").equals("lunch")) {
+                                    takeBackLunch.setVisibility(View.VISIBLE);
+                                    shareLunch.setVisibility(View.GONE);
+                                } else {
+                                    // dinner
+                                    takeBackDinner.setVisibility(View.VISIBLE);
+                                    shareDinner.setVisibility(View.GONE);
+                                }
                             }
                         }
-                    }
-                } else {
+                    } else {
 
+                    }
                 }
-            }
-        });
+            });
+
+            // When user wants to share either lunch or dinner
+            // When shareLunchBtn is clicked
+            shareLunch.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (currentUser != null) {
+                        // make button not clickable
+                        shareLunch.setEnabled(false);
+                        ParseObject mealPlan = new ParseObject("MealPlans");
+                        mealPlan.put("owner", currentUser);
+                        mealPlan.put("taker", currentUser);
+                        mealPlan.put("type", "lunch");
+                        mealPlan.put("isTaken", 0);
+                        mealPlan.put("isUsed", 0);
+                        mealPlan.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                shareLunch.setVisibility(View.GONE);
+                                takeBackLunch.setVisibility(View.VISIBLE);
+                                shareLunch.setEnabled(true);
+                                incrementSharedMealPlans();
+                            }
+                        });
+
+                    }
+                }
+            });
+
+            // When shareDinnerBtn is clicked
+            shareDinner.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (currentUser != null) {
+                        shareDinner.setEnabled(false);
+                        ParseObject mealPlan = new ParseObject("MealPlans");
+                        mealPlan.put("owner", currentUser);
+                        mealPlan.put("taker",currentUser);
+                        mealPlan.put("type", "dinner");
+                        mealPlan.put("isTaken", 0);
+                        mealPlan.put("isUsed", 0);
+                        mealPlan.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                shareDinner.setVisibility(View.GONE);
+                                takeBackDinner.setVisibility(View.VISIBLE);
+                                shareDinner.setEnabled(true);
+                                incrementSharedMealPlans();
+                            }
+                        });
+                    }
+                }
+            });
+
+            // When user wants to take back any of his meal plans in case if no one has already taken it
+            takeBackLunch.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // find that meal plan in MealPlnas table
+                    if (currentUser != null) {
+                        takeBackLunch.setEnabled(false);
+                        ParseQuery<ParseObject> mealPlan = ParseQuery.getQuery("MealPlans");
+                        mealPlan.whereEqualTo("owner", currentUser);
+                        mealPlan.whereEqualTo("type", "lunch");
+                        mealPlan.whereEqualTo("isTaken", 0);
+                        mealPlan.setLimit(1);
+                        mealPlan.findInBackground(new FindCallback<ParseObject>() {
+                            @Override
+                            public void done(List<ParseObject> mp, ParseException e) {
+                                // delete it
+                                if (e==null){
+                                    if (mp!=null && mp.size()!=0){
+                                        mp.get(0).deleteInBackground(new DeleteCallback() {
+                                            @Override
+                                            public void done(ParseException e) {
+                                                takeBackLunch.setVisibility(View.GONE);
+                                                shareLunch.setVisibility(View.VISIBLE);
+                                                decrementSharedMealPlans();
+                                                takeBackLunch.setEnabled(true);
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        takeBackLunch.setEnabled(true);
+                                        showAlertMessage(context,"Sorry!","Your meal plan has already been taken by someone","OK");
+                                    }
+                                }else {
+
+                                }
+
+                            }
+                        });
+                    }
+                }
+            });
+
+            takeBackDinner.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (currentUser != null) {
+                        takeBackDinner.setEnabled(false);
+                        ParseQuery<ParseObject> mealPlan = ParseQuery.getQuery("MealPlans");
+                        mealPlan.whereEqualTo("owner", currentUser);
+                        mealPlan.whereEqualTo("type", "dinner");
+                        mealPlan.whereEqualTo("isTaken", 0);
+                        mealPlan.setLimit(1);
+                        mealPlan.findInBackground(new FindCallback<ParseObject>() {
+                            @Override
+                            public void done(List<ParseObject> mp, ParseException e) {
+                                if (e == null) {
+                                    if (mp != null && mp.size() != 0) {
+                                        mp.get(0).deleteInBackground(new DeleteCallback() {
+                                            @Override
+                                            public void done(ParseException e) {
+                                                takeBackDinner.setEnabled(true);
+                                                takeBackDinner.setVisibility(View.GONE);
+                                                shareDinner.setVisibility(View.VISIBLE);
+                                                decrementSharedMealPlans();
+                                            }
+                                        });
+
+                                    } else {
+                                        takeBackDinner.setEnabled(true);
+                                        showAlertMessage(getContext(), "Sorry!", "Your meal plan has already been taken by someone", "OK");
+                                    }
+
+                                } else {
+
+                                }
+
+                            }
+                        });
+                    }
+                }
+            });
+
+
+        }
 
         getAllTakenMealPlans();
 
         // set swipe to refresh listener
-        swipeRefreshMealPlans.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
+        swipeRefreshMealPlans.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onRefresh(){
+            public void onRefresh() {
                 getAllTakenMealPlans();
-                getAllOpenMealPlans(getContext(),getActivity());
+                getAllOpenMealPlans(getContext(), getActivity());
                 swipeRefreshMealPlans.setRefreshing(false);
             }
 
-        });
-
-        // When user wants to share either lunch or dinner
-        // When shareLunchBtn is clicked
-        shareLunch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (currentUser != null) {
-                    // make button not clickable
-                    shareLunch.setEnabled(false);
-                    ParseObject mealPlan = new ParseObject("MealPlans");
-                    mealPlan.put("owner", currentUser);
-                    mealPlan.put("taker",currentUser);
-                    mealPlan.put("type", "lunch");
-                    mealPlan.put("isTaken", 0);
-                    mealPlan.put("isUsed", 0);
-                    mealPlan.saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            shareLunch.setVisibility(View.GONE);
-                            takeBackLunch.setVisibility(View.VISIBLE);
-                            shareLunch.setEnabled(true);
-                            incrementSharedMealPlans();
-                        }
-                    });
-
-                }
-            }
-        });
-
-        // When shareDinnerBtn is clicked
-        shareDinner.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (currentUser != null) {
-                    shareDinner.setEnabled(false);
-                    ParseObject mealPlan = new ParseObject("MealPlans");
-                    mealPlan.put("owner", currentUser);
-                    mealPlan.put("taker",currentUser);
-                    mealPlan.put("type", "dinner");
-                    mealPlan.put("isTaken", 0);
-                    mealPlan.put("isUsed", 0);
-                    mealPlan.saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            shareDinner.setVisibility(View.GONE);
-                            takeBackDinner.setVisibility(View.VISIBLE);
-                            shareDinner.setEnabled(true);
-                            incrementSharedMealPlans();
-                        }
-                    });
-                }
-            }
-        });
-
-        // When user wants to take back any of his meal plans in case if no one has already taken it
-        takeBackLunch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // find that meal plan in MealPlnas table
-                if (currentUser != null) {
-                    takeBackLunch.setEnabled(false);
-                    ParseQuery<ParseObject> mealPlan = ParseQuery.getQuery("MealPlans");
-                    mealPlan.whereEqualTo("owner", currentUser);
-                    mealPlan.whereEqualTo("type", "lunch");
-                    mealPlan.whereEqualTo("isTaken", 0);
-                    mealPlan.setLimit(1);
-                    mealPlan.findInBackground(new FindCallback<ParseObject>() {
-                        @Override
-                        public void done(List<ParseObject> mp, ParseException e) {
-                            // delete it
-                            if (e==null){
-                                if (mp!=null && mp.size()!=0){
-                                    mp.get(0).deleteInBackground(new DeleteCallback() {
-                                        @Override
-                                        public void done(ParseException e) {
-                                            takeBackLunch.setVisibility(View.GONE);
-                                            shareLunch.setVisibility(View.VISIBLE);
-                                            decrementSharedMealPlans();
-                                            takeBackLunch.setEnabled(true);
-                                        }
-                                    });
-                                }
-                                else {
-                                    takeBackLunch.setEnabled(true);
-                                    showAlertMessage(context,"Sorry!","Your meal plan has already been taken by someone","OK");
-                                }
-                            }else {
-
-                            }
-
-                        }
-                    });
-                }
-            }
-        });
-
-        takeBackDinner.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (currentUser != null) {
-                    takeBackDinner.setEnabled(false);
-                    ParseQuery<ParseObject> mealPlan = ParseQuery.getQuery("MealPlans");
-                    mealPlan.whereEqualTo("owner", currentUser);
-                    mealPlan.whereEqualTo("type", "dinner");
-                    mealPlan.whereEqualTo("isTaken",0);
-                    mealPlan.setLimit(1);
-                    mealPlan.findInBackground(new FindCallback<ParseObject>() {
-                        @Override
-                        public void done(List<ParseObject> mp, ParseException e) {
-                            if (e==null){
-                                if (mp!=null && mp.size()!=0){
-                                    mp.get(0).deleteInBackground(new DeleteCallback() {
-                                        @Override
-                                        public void done(ParseException e) {
-                                            takeBackDinner.setEnabled(true);
-                                            takeBackDinner.setVisibility(View.GONE);
-                                            shareDinner.setVisibility(View.VISIBLE);
-                                            decrementSharedMealPlans();
-                                        }
-                                    });
-
-                                } else {
-                                    takeBackDinner.setEnabled(true);
-                                    showAlertMessage(getContext(),"Sorry!","Your meal plan has already been taken by someone","OK");
-                                }
-
-                            }else {
-
-                            }
-
-                        }
-                    });
-                }
-            }
         });
 
 

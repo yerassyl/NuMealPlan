@@ -15,6 +15,11 @@
     <string name="logout">Logout</string>
     <string name="or">Or</string>
     <string name="signup">Sign up</string>
+    <string name="have_meal_plan">Do you have meal plan? (Check if yes, uncheck if no)</string>
+    <string name="do_you_have_meal_plan">Doy you have meal plan?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="save">Save</string>
 
     <string name="password_not_confirmed">Make sure you confirm your password!</string>
     <string name="name_is_required">Name is required</string>
@@ -57,5 +62,6 @@
     <string name="activation_email_sent">Your activation email has been sent to: </string>
     <string name="verify_email">Please activate your email in order to use Meal Plan saver application. </string>
     <string name="activated"> OK, activated </string>
+    <string name="title_activity_settings">Settings</string>
 
 </resources>

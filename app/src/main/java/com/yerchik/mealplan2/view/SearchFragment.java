@@ -15,6 +15,7 @@ import android.widget.SearchView;
 
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.parse.FindCallback;
+import com.parse.Parse;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -27,6 +28,8 @@ import java.util.List;
 
 public class SearchFragment extends Fragment {
     private static final String FRAGMENT_NAME = "Search";
+
+    ParseUser currentUser;
 
     ListView searchResults;
     UsersAdapter adapter;
@@ -54,6 +57,8 @@ public class SearchFragment extends Fragment {
         final SearchView searchFriends = (SearchView)getActivity().findViewById(R.id.friendSearchView);
         searchProgress = (CircularProgressView)getActivity().findViewById(R.id.progressSearch);
         searchFriends.setSubmitButtonEnabled(true);// enable submit button
+
+        currentUser = ParseUser.getCurrentUser();
 
         searchFriends.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -94,6 +99,7 @@ public class SearchFragment extends Fragment {
                 }
 
                 ParseQuery<ParseUser> mainQuery = ParseUser.getQuery().or(queries);
+                mainQuery.whereNotEqualTo("objectId", currentUser.getObjectId());
                 mainQuery.findInBackground(new FindCallback<ParseUser>() {
                     @Override
                     public void done(List<ParseUser> list, com.parse.ParseException e) {

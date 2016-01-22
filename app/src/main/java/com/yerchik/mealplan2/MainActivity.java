@@ -169,9 +169,14 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                 // logout the user
                 ParseUser.logOutInBackground();
                 dialogHome.dismiss();
-                finish();
                 Intent intent = new Intent(MainActivity.this,LoginActivity.class);
                 startActivity(intent);
+                finish();
+                break;
+            case R.id.action_settings:
+                Intent i = new Intent(MainActivity.this,SettingsActivity.class);
+                startActivity(i);
+                finish();
                 break;
         }
         return super.onOptionsItemSelected(item);
