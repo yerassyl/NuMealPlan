@@ -28,7 +28,6 @@ import com.yerchik.mealplan2.R;
 import com.yerchik.mealplan2.adapter.MealPlanAdapter;
 import com.yerchik.mealplan2.adapter.TakenMealPlanAdapter;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -56,9 +55,10 @@ public class MealPlansFragment extends Fragment {
     public static MealPlanAdapter openMealPlanAdapter;
     public static TakenMealPlanAdapter takenMealPlanAdapter;
 
+    public static Calendar cal;
     SwipeRefreshLayout swipeRefreshMealPlans;
 
-    public static int mp_count = 0;
+    //public static int mp_count = 0;
 
     public static MealPlansFragment newInstance(int sectionNumber){
         MealPlansFragment fragment = new MealPlansFragment();
@@ -99,6 +99,7 @@ public class MealPlansFragment extends Fragment {
 
         openMealPlansPOList = new ArrayList<ParseObject>();
         takenMealPlansPOList = new ArrayList<ParseObject>();
+        cal = getCalendar();
 
         // first check if user is subscribed to meal plan
         if (!currentUser.getBoolean("has_meal_plan")){
@@ -110,6 +111,8 @@ public class MealPlansFragment extends Fragment {
             // check if user shared any of his meal plans for the day (lucnh/dinner)
             ParseQuery<ParseObject> checkIfShared = ParseQuery.getQuery("MealPlans");
             checkIfShared.whereEqualTo("owner", currentUser);
+            checkIfShared.whereGreaterThan("createdAt", getToday(cal));
+            checkIfShared.whereLessThan("createdAt", getTomorrow(cal));
             checkIfShared.setLimit(2);
             checkIfShared.findInBackground(new FindCallback<ParseObject>() {
                 @Override
@@ -338,22 +341,9 @@ public class MealPlansFragment extends Fragment {
                 openMealPlansPOList.remove(tempPO);
                 // end fix
 
-                Calendar cal = new GregorianCalendar();
-                cal.set(Calendar.HOUR_OF_DAY, 0);
-                cal.set(Calendar.MINUTE, 0);
-                cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
-
-                final Date today = cal.getTime();
-
-                cal.add(Calendar.DAY_OF_MONTH, 1); // add one day to get start of tomorrow
-
-                // start of tomorrow
-                Date tomorrow = cal.getTime();
-
                 mealPlan.whereEqualTo("owner", MainActivity.userFriendships.get(i).getParseObject("from"));
-                mealPlan.whereGreaterThan("createdAt", today);
-                mealPlan.whereLessThan("createdAt", tomorrow);
+                mealPlan.whereGreaterThan("createdAt", getToday(cal));
+                mealPlan.whereLessThan("createdAt", getTomorrow(cal));
                 mealPlan.whereEqualTo("isTaken", 0);
 
                 mealPlan.findInBackground(new FindCallback<ParseObject>() {
@@ -472,5 +462,24 @@ public class MealPlansFragment extends Fragment {
         openMealPlanProgress.setVisibility(View.VISIBLE);
     }
 
+    public static Calendar getCalendar(){
+        Calendar cal = new GregorianCalendar();
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal;
+    }
+    public static Date getToday(Calendar cal){
+        final Date today = cal.getTime();
+        return today;
+
+    }
+    public static Date getTomorrow(Calendar cal){
+        cal.add(Calendar.DAY_OF_MONTH, 1); // add one day to get start of tomorrow
+        // start of tomorrow
+        Date tomorrow = cal.getTime();
+        return tomorrow;
+    }
 
 }
